@@ -6,6 +6,7 @@ use App\Http\Controllers\ChienDichController;
 use App\Http\Controllers\ThamGiaChienDichController;
 use App\Http\Controllers\TrangChuController;
 use App\Http\Controllers\NguoiDungController;
+use App\Http\Controllers\RecommendationController;
 use Illuminate\Support\Facades\Route;
 
 // =========================================== DANH MỤC (Public) ========================================
@@ -55,5 +56,9 @@ Route::middleware(['auth:api', 'tinhNguyenVien'])->group(function () {
         Route::get('/tinh-nguyen-vien/chien-dich', [ChienDichController::class, 'danhSach']);
         Route::get('/tinh-nguyen-vien/chien-dich/{id}', [ChienDichController::class, 'chiTiet']);
         Route::get('/tinh-nguyen-vien/chien-dich/{id}/giam-sat-bao-cao', [ChienDichController::class, 'giamSatBaoCao']);
+    });
+
+    Route::middleware('permission:ai_recommendation.view,campaign_coordination.view')->group(function () {
+        Route::get('/goi-y', [RecommendationController::class, 'goiY']);
     });
 });
