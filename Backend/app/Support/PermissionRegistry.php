@@ -31,7 +31,10 @@ class PermissionRegistry
             'scope' => 'user',
             'permissions' => ['campaign_participation.manage'],
         ],
-
+        'campaign_coordination' => [
+            'scope' => 'user',
+            'permissions' => ['campaign_coordination.view', 'campaign_coordination.manage'],
+        ],
     ];
 
     public const ROLE_DEFAULTS = [

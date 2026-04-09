@@ -31,7 +31,29 @@ Route::get('/xac-thuc/thong-tin', [XacThucController::class, 'layThongTin']);
 
 // =========================================== NGƯỜI DÙNG ===============================================
 Route::middleware('auth:api')->group(function () {
-    Route::post('/nguoi-dung/doi-mat-khau', [NguoiDungController::class, 'doiMatKhau']);
+    Route::middleware('permission:account_center.view')->group(function () {
+        Route::get('/nguoi-dung/thong-tin', [NguoiDungController::class, 'layThongTin']);
+    });
+    Route::middleware('permission:account_center.manage')->group(function () {
+        Route::post('/nguoi-dung/cap-nhat-thong-tin', [NguoiDungController::class, 'capNhatThongTin']);
+        Route::post('/nguoi-dung/doi-mat-khau', [NguoiDungController::class, 'doiMatKhau']);
+    });
+
+    // API dành riêng cho Tình nguyện viên
+    Route::middleware('permission:competency_profile.view')->group(function () {
+        Route::get('/nguoi-dung/ho-so-nang-luc', [NguoiDungController::class, 'layHoSoNangLuc']);
+    });
+
+    Route::middleware('permission:competency_profile.manage')->group(function () {
+        Route::put('/nguoi-dung/ho-so-nang-luc', [NguoiDungController::class, 'luuHoSoNangLuc']);
+    });
 });
 
-
+// =========================================== Tình Nguyện Viên ==========================================
+Route::middleware(['auth:api', 'tinhNguyenVien'])->group(function () {
+    Route::middleware('permission:volunteer_campaigns.view,campaign_coordination.view,campaign_report_monitoring.view')->group(function () {
+        Route::get('/tinh-nguyen-vien/chien-dich', [ChienDichController::class, 'danhSach']);
+        Route::get('/tinh-nguyen-vien/chien-dich/{id}', [ChienDichController::class, 'chiTiet']);
+        Route::get('/tinh-nguyen-vien/chien-dich/{id}/giam-sat-bao-cao', [ChienDichController::class, 'giamSatBaoCao']);
+    });
+});
