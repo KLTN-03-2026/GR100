@@ -287,8 +287,7 @@ POST   /api/admin/danh-muc/{type}                         # Thêm danh mục
 ### 1. Clone Dự Án
 
 ```bash
-git clone https://github.com/your-username/Volunteer-Management.git
-cd Volunteer-Management
+https://github.com/KLTN-03-2026/GR100.git
 ```
 
 ---
