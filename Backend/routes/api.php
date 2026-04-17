@@ -7,6 +7,8 @@ use App\Http\Controllers\ThamGiaChienDichController;
 use App\Http\Controllers\TrangChuController;
 use App\Http\Controllers\NguoiDungController;
 use App\Http\Controllers\RecommendationController;
+use App\Http\Controllers\TheoDoiPhanHoiController;
+use App\Http\Controllers\ThongKeTongQuanController;
 use Illuminate\Support\Facades\Route;
 
 // =========================================== DANH MỤC (Public) ========================================
@@ -56,6 +58,30 @@ Route::middleware(['auth:api', 'tinhNguyenVien'])->group(function () {
         Route::get('/tinh-nguyen-vien/chien-dich', [ChienDichController::class, 'danhSach']);
         Route::get('/tinh-nguyen-vien/chien-dich/{id}', [ChienDichController::class, 'chiTiet']);
         Route::get('/tinh-nguyen-vien/chien-dich/{id}/giam-sat-bao-cao', [ChienDichController::class, 'giamSatBaoCao']);
+    });
+    Route::middleware('permission:volunteer_campaigns.manage')->group(function () {
+        Route::post('/tinh-nguyen-vien/chien-dich', [ChienDichController::class, 'taoMoi']);
+        Route::put('/tinh-nguyen-vien/chien-dich/{id}', [ChienDichController::class, 'capNhat']);
+        Route::put('/tinh-nguyen-vien/chien-dich/{id}/trang-thai', [ChienDichController::class, 'capNhatTrangThai']);
+        Route::put('/tinh-nguyen-vien/chien-dich/{id}/dang-ky/{registrationId}/trang-thai', [ChienDichController::class, 'capNhatTrangThaiDangKy']);
+        Route::put('/tinh-nguyen-vien/chien-dich/{id}/huy', [ChienDichController::class, 'huyChienDich']);
+    });
+    Route::middleware('permission:campaign_participation.manage')->group(function () {
+        Route::post('/chien-dich/{id}/dang-ky', [ThamGiaChienDichController::class, 'dangKy']);
+        Route::put('/chien-dich/{id}/huy-dang-ky', [ThamGiaChienDichController::class, 'huyDangKy']);
+        Route::put('/chien-dich/{id}/xac-nhan-tham-gia', [ThamGiaChienDichController::class, 'xacNhanThamGia']);
+    });
+     Route::middleware('permission:campaign_coordination.manage')->group(function () {
+        Route::post('/chien-dich/{id}/moi-tinh-nguyen-vien', [RecommendationController::class, 'moiTinhNguyenVien']);
+    });
+
+    Route::middleware('permission:feedback_tracking.view')->group(function () {
+        Route::get('/tinh-nguyen-vien/theo-doi-phan-hoi', [TheoDoiPhanHoiController::class, 'tongQuan']);
+    });
+
+    Route::middleware('permission:feedback_tracking.manage')->group(function () {
+        Route::post('/tinh-nguyen-vien/theo-doi-phan-hoi/bao-cao', [TheoDoiPhanHoiController::class, 'taoBaoCao']);
+        Route::post('/tinh-nguyen-vien/theo-doi-phan-hoi/danh-gia-chien-dich', [TheoDoiPhanHoiController::class, 'danhGiaChienDich']);
     });
 
     Route::middleware('permission:ai_recommendation.view,campaign_coordination.view')->group(function () {
