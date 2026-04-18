@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { refreshCurrentUser } from "../services/api";
 import {
 	getFirstAccessibleAdminRoute,
 	getFirstAccessibleUserRoute,
@@ -97,11 +98,42 @@ const routes = [
         component: () => import('../components/User/Giam_Sat_Bao_Cao.vue'),
         meta: { layout: 'default', requiresAuth: true, permissions: ['campaign_report_monitoring.view'] }
     },
+    // ===== Admin Routes =====
+    {
+        path: '/admin',
+        component: () => import('../components/Admin/Dashboard.vue'),
+        meta: { layout: 'admin', permissions: ['dashboard.view'] }
+    },
+    {
+        path: '/admin/nguoi-dung',
+        component: () => import('../components/Admin/Quan_Ly_Nguoi_Dung.vue'),
+        meta: { layout: 'admin', permissions: ['user_management.view'] }
+    },
+    {
+        path: '/admin/chien-dich',
+        redirect: '/kiem-duyet-vien/chien-dich',
+    },
     {
         path: '/kiem-duyet-vien/chien-dich',
         component: () => import('../components/Kiem_Duyet_Vien/Quan_Ly_Chien_Dich.vue'),
-        meta: { layout: 'default', permissions: ['campaign_review.view'] }
-    }
+        meta: { layout: 'admin', permissions: ['campaign_review.view'] }
+    },
+    {
+        path: '/admin/danh-muc',
+        component: () => import('../components/Admin/Quan_Ly_Danh_Muc.vue'),
+        meta: { layout: 'admin', permissions: ['category_management.view'] }
+    },
+
+    {
+        path: '/admin/thong-ke',
+        redirect: '/kiem-duyet-vien/thong-ke',
+    },
+    {
+        path: '/kiem-duyet-vien/thong-ke',
+        component: () => import('../components/Admin/Thong_Ke.vue'),
+        meta: { layout: 'admin', permissions: ['statistics.view'] }
+    },
+
 ]
 
 const router = createRouter({
@@ -117,7 +149,7 @@ function getAuthenticatedHome(role) {
         currentUser = null;
     }
 
-    if (role === 'kiem_duyet_vien') {
+    if (role === 'kiem_duyet_vien' || role === 'quan_tri_vien') {
         const adminHome = getFirstAccessibleAdminRoute(currentUser);
         return adminHome !== '/' ? adminHome : getFirstAccessibleUserRoute(currentUser);
     }
@@ -125,7 +157,9 @@ function getAuthenticatedHome(role) {
     return getFirstAccessibleUserRoute(currentUser);
 }
 
-router.beforeEach((to, from, next) => {
+router.beforeEach(async (to, from, next) => {
+    await refreshCurrentUser({ silent: true });
+
     let currentUser = null;
     try {
         currentUser = JSON.parse(localStorage.getItem('user') || 'null');
@@ -136,8 +170,13 @@ router.beforeEach((to, from, next) => {
     const role = currentUser?.vai_tro || null;
     const hasToken = Boolean(localStorage.getItem('token'));
     const isAuthenticated = Boolean(role && hasToken);
+    const isAdminRoute = to.path.startsWith('/admin') || to.path.startsWith('/kiem-duyet-vien');
     const isReviewerRoute = to.path.startsWith('/kiem-duyet-vien');
     const hasRoutePermission = hasAnyPermission(currentUser, to.meta.permissions || []);
+
+    if (role === 'kiem_duyet_vien' && to.path === '/admin' && !hasAnyPermission(currentUser, to.meta.permissions || [])) {
+        return next(getAuthenticatedHome(role));
+    }
 
     if (to.meta.guestOnly && isAuthenticated) {
         return next(getAuthenticatedHome(role));
@@ -147,7 +186,7 @@ router.beforeEach((to, from, next) => {
         return next('/dang-nhap');
     }
 
-    if (!role && isReviewerRoute) {
+    if (!role && isAdminRoute) {
         return next('/');
     }
 
@@ -155,11 +194,15 @@ router.beforeEach((to, from, next) => {
         return next(getAuthenticatedHome(role));
     }
 
-    if (isReviewerRoute && !hasRoutePermission) {
+    if (role !== 'kiem_duyet_vien' && role !== 'quan_tri_vien' && isAdminRoute) {
+        return next('/');
+    }
+
+    if (isAdminRoute && !hasRoutePermission) {
         return next(getAuthenticatedHome(role));
     }
 
-    if (!isReviewerRoute && to.meta.requiresAuth && !hasRoutePermission) {
+    if (!isAdminRoute && to.meta.requiresAuth && !hasRoutePermission) {
         return next(getAuthenticatedHome(role));
     }
 

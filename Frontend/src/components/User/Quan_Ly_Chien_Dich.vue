@@ -86,11 +86,11 @@
 								<td class="ps-3">
 									<div class="d-flex align-items-center gap-2 gap-md-3">
 										<div class="campaign-avatar rounded-3 d-flex align-items-center justify-content-center text-white flex-shrink-0" :style="getCampaignCoverStyle(campaign, 'avatar')">
-											<i :class="campaign.icon"></i>
+											<i v-if="!campaignHasCover(campaign)" :class="campaign.icon"></i>
 										</div>
 										<div style="min-width: 0;">
 											<div class="fw-bold text-dark text-truncate" style="max-width: 300px;">{{ campaign.title }}</div>
-											<div class="text-muted small text-truncate d-none d-sm-block" style="max-width: 300px;" :title="campaign.description">{{ campaign.description }}</div>
+											<div class="text-muted small text-truncate d-none d-sm-block" style="max-width: 300px;" :title="campaign.description">{{ campaign.descriptionPreview || campaign.description }}</div>
 										</div>
 									</div>
 								</td>
@@ -117,16 +117,16 @@
 										<button type="button" class="btn btn-sm btn-light border-0 bg-transparent shadow-none" :title="$t('coordinator.viewDetailsMenu')" @click.prevent="viewCampaign(campaign)">
 											<i class="fa-regular fa-eye text-primary fs-6"></i>
 										</button>
-										<button v-if="canManageCampaigns" type="button" class="btn btn-sm btn-light border-0 bg-transparent shadow-none" :title="$t('coordinator.editMenu')" @click.prevent="editCampaign(campaign)">
+										<button v-if="canEditCampaign(campaign)" type="button" class="btn btn-sm btn-light border-0 bg-transparent shadow-none" :title="$t('coordinator.editMenu')" @click.prevent="editCampaign(campaign)">
 											<i class="fa-regular fa-pen-to-square text-warning fs-6"></i>
 										</button>
-										<button v-if="canManageCampaigns && campaign.status === 'approved'" type="button" class="btn btn-sm btn-light border-0 bg-transparent shadow-none" :title="$t('coordinator.startCampaignMenu')" @click.prevent="confirmStatusChange(campaign, 'dang_dien_ra')">
+										<button v-if="canStartCampaign(campaign)" type="button" class="btn btn-sm btn-light border-0 bg-transparent shadow-none" :title="$t('coordinator.startCampaignMenu')" @click.prevent="confirmStatusChange(campaign, 'dang_dien_ra')">
 											<i class="fa-solid fa-play text-success fs-6"></i>
 										</button>
 										<button v-if="canManageCampaigns && campaign.status === 'active'" type="button" class="btn btn-sm btn-light border-0 bg-transparent shadow-none" :title="$t('coordinator.completeCampaignMenu')" @click.prevent="confirmStatusChange(campaign, 'hoan_thanh')">
 											<i class="fa-solid fa-flag-checkered text-success fs-6"></i>
 										</button>
-										<button v-if="canManageCampaigns" type="button" class="btn btn-sm btn-light border-0 bg-transparent shadow-none" :title="$t('coordinator.cancelCampaignMenu')" @click.prevent="confirmCancel(campaign)">
+										<button v-if="canDeleteCampaign(campaign)" type="button" class="btn btn-sm btn-light border-0 bg-transparent shadow-none" :title="$t('coordinator.cancelCampaignMenu')" @click.prevent="confirmCancel(campaign)">
 											<i class="fa-regular fa-trash-can text-danger fs-6"></i>
 										</button>
 									</div>
@@ -154,7 +154,7 @@
 							</div>
 							<div class="card-body pb-2">
 								<h6 class="fw-bold text-dark mb-2 text-truncate">{{ campaign.title }}</h6>
-								<p class="text-muted small mb-3 text-truncate-2">{{ campaign.description }}</p>
+								<p class="text-muted small mb-3 text-truncate-2" :title="campaign.description">{{ campaign.descriptionPreview || campaign.description }}</p>
 								<div class="d-flex flex-column gap-1 small text-muted">
 									<div class="text-truncate"><i class="fa-solid fa-location-dot me-2 text-danger"></i>{{ campaign.location }}</div>
 									<div><i class="fa-regular fa-calendar me-2 text-primary"></i>{{ campaign.startDate }} — {{ campaign.endDate }}</div>
@@ -171,19 +171,19 @@
 								</div>
 							</div>
 							<div class="card-footer bg-transparent border-top py-2 d-flex gap-2">
-								<button v-if="canManageCampaigns" class="btn btn-sm btn-outline-primary flex-fill d-flex align-items-center justify-content-center gap-1" @click="editCampaign(campaign)">
+								<button v-if="canEditCampaign(campaign)" class="btn btn-sm btn-outline-primary flex-fill d-flex align-items-center justify-content-center gap-1" @click="editCampaign(campaign)">
 									<i class="fa-regular fa-pen-to-square" style="font-size:12px"></i><span>{{ $t('coordinator.editBtn') }}</span>
 								</button>
 								<button class="btn btn-sm btn-outline-secondary flex-fill d-flex align-items-center justify-content-center gap-1" @click="viewCampaign(campaign)">
 									<i class="fa-regular fa-eye" style="font-size:12px"></i><span>{{ $t('coordinator.detailsBtn') }}</span>
 								</button>
-								<button v-if="canManageCampaigns && campaign.status === 'approved'" class="btn btn-sm btn-outline-success d-flex align-items-center justify-content-center" style="width: 34px;height: 34px;padding-left: 10px;" :title="$t('coordinator.startCampaignMenu')" @click="confirmStatusChange(campaign, 'dang_dien_ra')">
+								<button v-if="canStartCampaign(campaign)" class="btn btn-sm btn-outline-success d-flex align-items-center justify-content-center" style="width: 34px;height: 34px;padding-left: 10px;" :title="$t('coordinator.startCampaignMenu')" @click="confirmStatusChange(campaign, 'dang_dien_ra')">
 									<i class="fa-solid fa-play" style="font-size:12px"></i>
 								</button>
 								<button v-else-if="canManageCampaigns && campaign.status === 'active'" class="btn btn-sm btn-outline-success d-flex align-items-center justify-content-center" style="width: 34px;height: 34px;padding-left: 10px;" :title="$t('coordinator.completeCampaignMenu')" @click="confirmStatusChange(campaign, 'hoan_thanh')">
 									<i class="fa-solid fa-flag-checkered" style="font-size:12px"></i>
 								</button>
-								<button v-if="canManageCampaigns" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" style="width: 34px;height: 34px;padding-left: 12px;" @click="confirmCancel(campaign)">
+								<button v-if="canDeleteCampaign(campaign)" class="btn btn-sm btn-outline-danger d-flex align-items-center justify-content-center" style="width: 34px;height: 34px;padding-left: 12px;" @click="confirmCancel(campaign)">
 									<i class="fa-regular fa-circle-xmark" style="font-size:12px"></i>
 								</button>
 							</div>
@@ -241,7 +241,7 @@
 
 		<!-- CREATE/EDIT MODAL -->
 		<div class="modal fade" id="campaignModal" tabindex="-1" ref="campaignModal">
-			<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+			<div class="modal-dialog campaign-modal-2xl modal-dialog-centered modal-dialog-scrollable">
 				<div class="modal-content border-0 shadow">
 					<div class="modal-header border-bottom px-4 pt-4 pb-3">
 						<h5 class="modal-title fw-bold fs-4 text-dark">{{ isEditing ? $t('coordinator.editCampaignTitle') : $t('coordinator.createCampaignTitle') }}</h5>
@@ -258,28 +258,129 @@
 									<div v-if="formErrors.title" class="invalid-feedback d-block">{{ formErrors.title }}</div>
 								</div>
 								<div class="col-12">
-									<label class="form-label fw-semibold small">{{ $t('coordinator.descriptionLabel') }} <span class="text-danger">*</span></label>
-									<textarea class="form-control" rows="3" :class="{ 'is-invalid': formErrors.description }" v-model.trim="formData.description" :placeholder="$t('coordinator.descriptionPlaceholder')" required></textarea>
-									<div v-if="formErrors.description" class="invalid-feedback d-block">{{ formErrors.description }}</div>
+									<label class="form-label fw-semibold small mb-2">{{ $t('coordinator.descriptionLabel') }} <span class="text-danger">*</span></label>
+									<div class="row g-3">
+										<div v-for="field in descriptionFieldConfigs" :key="field.key" class="col-12 col-xl-6">
+											<label class="form-label fw-semibold small">{{ field.label }}</label>
+											<textarea
+												class="form-control"
+												rows="3"
+												v-model.trim="formData.descriptionForm[field.key]"
+												:placeholder="field.placeholder"></textarea>
+										</div>
+									</div>
 								</div>
 								<div class="col-12">
-									<label class="form-label fw-semibold small">Hình ảnh chiến dịch</label>
-									<input type="file" class="form-control" :class="{ 'is-invalid': formErrors.images }" accept="image/*" multiple @change="onCampaignImagesChange">
-									<div class="form-text">Có thể chọn nhiều ảnh. Ảnh đầu tiên sẽ dùng làm ảnh bìa.</div>
-									<div v-if="formErrors.images" class="invalid-feedback d-block">{{ formErrors.images }}</div>
-									<div v-if="formData.previewImages.length" class="row g-3 mt-1">
-										<div v-for="(image, index) in formData.previewImages" :key="image.key" class="col-sm-6 col-lg-4">
-											<div class="border rounded-3 overflow-hidden bg-light position-relative h-100">
-												<div class="position-absolute top-0 start-0 m-2 badge" :class="index === 0 ? 'bg-primary' : 'bg-dark bg-opacity-75'">
-													{{ index === 0 ? 'Ảnh bìa' : `Ảnh ${index + 1}` }}
+									<label class="form-label fw-semibold small">Mô tả hoàn chỉnh</label>
+									<textarea
+										class="form-control bg-light-subtle"
+										rows="6"
+										:value="generatedDescriptionValue"
+										readonly
+									></textarea>
+									<div v-if="formErrors.description" class="invalid-feedback d-block">{{ formErrors.description }}</div>
+									<div class="form-text">Nội dung này sẽ được gửi lên hệ thống làm mô tả chiến dịch.</div>
+								</div>
+								<div class="col-12">
+									<div class="row g-3">
+										<div class="col-12">
+											<label class="form-label fw-semibold small">Ảnh bìa <span class="text-danger">*</span></label>
+											<div class="upload-media-card" :class="{ 'is-invalid': formErrors.coverImage }">
+												<div class="upload-media-preview">
+													<img
+														v-if="formData.coverPreviewImage"
+														:src="formData.coverPreviewImage.url"
+														alt="Ảnh bìa chiến dịch"
+														class="upload-media-image">
+													<div v-else class="upload-media-placeholder">
+														<i class="fa-regular fa-image"></i>
+														<span>Chưa chọn ảnh bìa</span>
+													</div>
+													<button
+														v-if="formData.coverPreviewImage"
+														type="button"
+														class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 rounded-circle shadow-sm"
+														@click="removeCoverImage">
+														<i class="fa-solid fa-xmark"></i>
+													</button>
 												</div>
-												<button
-													type="button"
-													class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 rounded-circle shadow-sm"
-													@click="removeCampaignImage(image)">
-													<i class="fa-solid fa-xmark"></i>
+												<div class="upload-media-body">
+													<input
+														type="file"
+														class="form-control"
+														accept="image/*"
+														@change="onCoverImageChange">
+													<div class="form-text mt-2">
+														{{ formData.coverImageFile?.name || 'Ảnh này sẽ được dùng làm ảnh bìa chiến dịch.' }}
+													</div>
+												</div>
+											</div>
+											<div v-if="formErrors.coverImage" class="invalid-feedback d-block">{{ formErrors.coverImage }}</div>
+										</div>
+										<div class="col-12">
+											<div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+												<label class="form-label fw-semibold small mb-0">Ảnh mô tả chiến dịch <span class="text-danger">*</span></label>
+												<button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3" @click="addDetailImageInput">
+													<i class="fa-solid fa-plus me-1"></i>Thêm ảnh
 												</button>
-												<img :src="image.url" alt="Hình ảnh chiến dịch" class="w-100 object-fit-cover" style="height: 180px;">
+											</div>
+											<div class="row g-3">
+												<div v-for="(uploadInput, index) in formData.detailImageInputs" :key="uploadInput.id" class="col-12 col-md-4">
+													<div class="upload-media-card h-100" :class="{ 'is-invalid': formErrors.detailImages }">
+														<div class="upload-media-preview">
+															<img
+																v-if="uploadInput.previewUrl"
+																:src="uploadInput.previewUrl"
+																:alt="`Ảnh mô tả ${index + 1}`"
+																class="upload-media-image">
+															<div v-else class="upload-media-placeholder">
+																<i class="fa-regular fa-images"></i>
+																<span>{{ `Ảnh mô tả ${index + 1}` }}</span>
+															</div>
+															<button
+																type="button"
+																class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 rounded-circle shadow-sm"
+																@click="removeDetailImageInput(uploadInput.id)"
+																:title="'Xóa ô upload'"
+																:disabled="formData.detailImageInputs.length <= 3 && !uploadInput.file">
+																<i class="fa-solid fa-xmark"></i>
+															</button>
+														</div>
+														<div class="upload-media-body">
+															<input
+																type="file"
+																class="form-control"
+																accept="image/*"
+																@change="onDetailImagesChange($event, uploadInput.id)">
+															<div class="form-text mt-2">
+																{{ uploadInput.file?.name || 'Ô upload ảnh mô tả chiến dịch.' }}
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
+											<div class="form-text">Vui lòng tải tối thiểu 3 ảnh mô tả chiến dịch.</div>
+											<div v-if="formErrors.detailImages" class="invalid-feedback d-block">{{ formErrors.detailImages }}</div>
+											<div v-if="false && formData.existingDetailImages.length" class="row g-3 mt-1">
+												<div v-for="(imageUrl, index) in formData.existingDetailImages" :key="`existing-detail-card-${imageUrl}-${index}`" class="col-sm-6 col-lg-4">
+													<div class="upload-media-card h-100">
+														<div class="upload-media-preview">
+															<div class="position-absolute top-0 start-0 m-2 badge bg-dark bg-opacity-75">
+																{{ `Ảnh hiện tại ${index + 1}` }}
+															</div>
+															<button
+																type="button"
+																class="btn btn-sm btn-light position-absolute top-0 end-0 m-2 rounded-circle shadow-sm"
+																@click="removeDetailImage({ type: 'existing-detail', url: imageUrl })">
+																<i class="fa-solid fa-xmark"></i>
+															</button>
+															<img :src="imageUrl" alt="Hình ảnh chiến dịch" class="upload-media-image">
+														</div>
+														<div class="upload-media-body py-2">
+															<div class="small text-muted">Ảnh mô tả hiện tại của chiến dịch.</div>
+														</div>
+													</div>
+												</div>
 											</div>
 										</div>
 									</div>
@@ -312,14 +413,55 @@
 							<div class="row g-3 mb-4">
 								<div class="col-12">
 									<label class="form-label fw-semibold small">{{ $t('coordinator.locationLabel') }} <span class="text-danger">*</span></label>
-									<div class="input-group">
-										<span class="input-group-text bg-light"><i class="fa-solid fa-location-dot text-danger"></i></span>
-										<input type="text" class="form-control" :class="{ 'is-invalid': formErrors.location }" v-model.trim="formData.location" :placeholder="$t('coordinator.locationPlaceholder')" required>
-										<span class="input-group-text bg-white" v-if="campaignGeocoding">
-											<span class="spinner-border spinner-border-sm text-primary" role="status"></span>
-										</span>
+									<div class="position-relative">
+										<div class="input-group">
+											<span class="input-group-text bg-light"><i class="fa-solid fa-location-dot text-danger"></i></span>
+											<input
+												ref="locationInput"
+												type="text"
+												class="form-control"
+												:class="{ 'is-invalid': formErrors.location }"
+												v-model.trim="formData.location"
+												:placeholder="$t('coordinator.locationPlaceholder')"
+												autocomplete="off"
+												required
+												@input="handleLocationInput"
+												@focus="handleLocationFocus"
+												@blur="handleLocationBlur"
+												@keydown="handleLocationKeydown">
+											<span class="input-group-text bg-white" v-if="campaignGeocoding || locationSuggestionLoading">
+												<span class="spinner-border spinner-border-sm text-primary" role="status"></span>
+											</span>
+										</div>
+										<div
+											v-if="locationSuggestionsVisible && (locationSuggestions.length || locationSuggestionLoading || formData.location)"
+											class="location-suggestions-dropdown shadow-sm">
+											<div
+												v-for="(suggestion, index) in locationSuggestions"
+												:key="suggestion.key"
+												class="location-suggestion-item"
+												:class="{ active: index === locationSuggestionIndex }"
+												role="button"
+												tabindex="-1"
+												@mousedown.prevent="selectLocationSuggestion(suggestion)">
+												<div class="d-flex justify-content-between align-items-start gap-3">
+													<div class="min-w-0">
+														<div class="fw-semibold text-dark text-truncate">{{ suggestion.label }}</div>
+														<div v-if="suggestion.meta" class="small text-muted text-truncate">{{ suggestion.meta }}</div>
+													</div>
+													<span class="badge rounded-pill location-suggestion-source">{{ getLocationSuggestionSourceLabel(suggestion.source) }}</span>
+												</div>
+											</div>
+											<div v-if="locationSuggestionLoading && !locationSuggestions.length" class="location-suggestion-empty text-muted">
+												<i class="fa-solid fa-spinner fa-spin me-2"></i>{{ $t('coordinator.locationSuggestionLoading') }}
+											</div>
+											<div v-else-if="!locationSuggestionLoading && !locationSuggestions.length && formData.location" class="location-suggestion-empty text-muted">
+												<i class="fa-solid fa-circle-info me-2"></i>{{ $t('coordinator.locationSuggestionsEmpty') }}
+											</div>
+										</div>
 									</div>
 									<div v-if="formErrors.location" class="invalid-feedback d-block">{{ formErrors.location }}</div>
+									<div class="form-text small text-muted">{{ $t('coordinator.locationHint') }}</div>
 									<div class="form-text small" v-if="campaignGeocodeStatus">
 										<i :class="campaignGeocodeStatus === 'success' ? 'fa-solid fa-check-circle text-success' : 'fa-solid fa-info-circle text-warning'" class="me-1"></i>
 										<span :class="campaignGeocodeStatus === 'success' ? 'text-success' : 'text-warning'">{{ campaignGeocodeMessage }}</span>
@@ -460,6 +602,7 @@ import StatCards from '../../components/StatCards.vue'
 import ConfirmModal from '../../components/ConfirmModal.vue'
 import api from '../../services/api'
 import { hasPermission } from '../../utils/permissions'
+import { buildCampaignDescriptionPreview, extractCampaignDescriptionSections } from '../../utils/campaignDescription'
 
 // Priority mapping: DB enum ↔ frontend key
 const PRIORITY_MAP = { khan_cap: 'urgent', cao: 'high', trung_binh: 'medium', thap: 'low' };
@@ -467,6 +610,54 @@ const PRIORITY_MAP_REVERSE = { urgent: 'khan_cap', high: 'cao', medium: 'trung_b
 
 // Status mapping: DB enum → frontend key
 const STATUS_MAP = { cho_duyet: 'pending', tu_choi: 'rejected', da_duyet: 'approved', dang_dien_ra: 'active', hoan_thanh: 'completed', yeu_cau_huy: 'pending_cancel', da_huy: 'cancelled', nhap: 'draft' };
+
+const DESCRIPTION_FIELD_CONFIG = [
+	{
+		key: 'purpose',
+		label: 'Chiến dịch này được tổ chức nhằm mục đích gì?',
+		placeholder: 'Ví dụ: Hỗ trợ học sinh vùng sâu có thêm điều kiện học tập và sinh hoạt tốt hơn.',
+		sentence: 'Chiến dịch này được tổ chức nhằm mục đích {value}.',
+	},
+	{
+		key: 'problem',
+		label: 'Vấn đề hoặc nhu cầu nào mà chiến dịch muốn giải quyết?',
+		placeholder: 'Ví dụ: Thiếu sách vở, vật dụng học tập và hoạt động đồng hành cho học sinh.',
+		sentence: 'Chiến dịch tập trung giải quyết vấn đề hoặc nhu cầu là {value}.',
+	},
+	{
+		key: 'tasks',
+		label: 'Tình nguyện viên sẽ thực hiện những công việc cụ thể nào?',
+		placeholder: 'Ví dụ: Phân loại quà tặng, tổ chức trò chơi, hỗ trợ hậu cần và hướng dẫn các em.',
+		sentence: 'Tình nguyện viên sẽ trực tiếp thực hiện các công việc như {value}.',
+	},
+	{
+		key: 'commitment',
+		label: 'Tình nguyện viên cần cam kết những gì khi tham gia?',
+		placeholder: 'Ví dụ: Có mặt đúng giờ, phối hợp theo nhóm và tuân thủ hướng dẫn của ban tổ chức.',
+		sentence: 'Khi tham gia, tình nguyện viên cần cam kết {value}.',
+	},
+	{
+		key: 'benefits',
+		label: 'Quyền lợi hoặc hỗ trợ dành cho tình nguyện viên là gì?',
+		placeholder: 'Ví dụ: Được hỗ trợ ăn trưa, cấp giấy chứng nhận và hướng dẫn trước khi tham gia.',
+		sentence: 'Quyền lợi hoặc hỗ trợ dành cho tình nguyện viên bao gồm {value}.',
+	},
+	{
+		key: 'contact',
+		label: 'Thông tin liên hệ của người phụ trách chiến dịch là gì?',
+		placeholder: 'Ví dụ: Chị Lan - 09xx xxx xxx - lan@vms.vn.',
+		sentence: 'Thông tin liên hệ của người phụ trách chiến dịch là {value}.',
+	},
+];
+
+const DESCRIPTION_FIELD_PREFIXES = {
+	purpose: 'Chiến dịch này được tổ chức nhằm mục đích',
+	problem: 'Chiến dịch tập trung giải quyết vấn đề hoặc nhu cầu là',
+	tasks: 'Tình nguyện viên sẽ trực tiếp thực hiện các công việc như',
+	commitment: 'Khi tham gia, tình nguyện viên cần cam kết',
+	benefits: 'Quyền lợi hoặc hỗ trợ dành cho tình nguyện viên bao gồm',
+	contact: 'Thông tin liên hệ của người phụ trách chiến dịch là',
+};
 
 export default {
 	name: "QuanLyChienDich",
@@ -502,17 +693,33 @@ export default {
 			campaignGeocodeStatus: '',
 			campaignGeocodeMessage: '',
 			campaignGeocodeTimer: null,
+			locationOptions: [],
+			locationSuggestions: [],
+			locationSuggestionsVisible: false,
+			locationSuggestionIndex: -1,
+			locationSuggestionLoading: false,
+			locationSuggestionTimer: null,
+			locationSuggestionRequestId: 0,
 			formErrors: {},
 			formData: {
 				title: '', description: '', category: '', priority: '',
+				descriptionForm: DESCRIPTION_FIELD_CONFIG.reduce((accumulator, field) => {
+					accumulator[field.key] = '';
+					return accumulator;
+				}, {}),
 				location: '', latitude: null, longitude: null,
 				startDate: '', endDate: '',
 				maxVolunteers: null, minVolunteers: null, requiredSkills: [],
 				coverUrl: null,
 				images: [],
-				existingImages: [],
-				newImages: [],
-				previewImages: [],
+				existingCoverImage: null,
+				coverImageFile: null,
+				coverPreviewUrl: '',
+				coverPreviewImage: null,
+				existingDetailImages: [],
+				detailImages: [],
+				detailImageInputs: [],
+				detailPreviewImages: [],
 			},
 			campaigns: [],
 			campaignTypes: [],
@@ -549,6 +756,12 @@ export default {
 				name: this.$t(`skillNames.${i + 1}`),
 				icon: ['fa-solid fa-calendar-check','fa-solid fa-boxes-stacked','fa-solid fa-kit-medical','fa-solid fa-bullhorn','fa-solid fa-chalkboard-teacher','fa-solid fa-laptop-code','fa-solid fa-utensils','fa-solid fa-truck','fa-solid fa-brain','fa-solid fa-camera'][i]
 			}));
+		},
+		descriptionFieldConfigs() {
+			return DESCRIPTION_FIELD_CONFIG;
+		},
+		generatedDescriptionValue() {
+			return this.buildDescriptionPayload();
 		},
 		canManageCampaigns() {
 			try {
@@ -613,13 +826,32 @@ export default {
 		},
 		'formData.location'(newVal, oldVal) {
 			if (this.campaignGeocodeTimer) clearTimeout(this.campaignGeocodeTimer);
+			if (this.locationSuggestionTimer) clearTimeout(this.locationSuggestionTimer);
 			if (this.isEditing && this._justOpenedEdit) {
 				this._justOpenedEdit = false;
 				return;
 			}
-			if (newVal && newVal.length >= 5 && newVal !== oldVal) {
+			if (this._applyingLocationSuggestion) {
+				this._applyingLocationSuggestion = false;
+				return;
+			}
+			const query = String(newVal || '').trim();
+			if (!query) {
+				this.locationSuggestions = [];
+				this.locationSuggestionsVisible = false;
+				this.locationSuggestionIndex = -1;
+				this.locationSuggestionLoading = false;
+				this.campaignGeocodeStatus = '';
+				this.campaignGeocodeMessage = '';
+				this.formData.latitude = null;
+				this.formData.longitude = null;
+				this.destroyCampaignMap();
+				return;
+			}
+			this.queueLocationSuggestions(query);
+			if (query.length >= 3 && query !== oldVal) {
 				this.campaignGeocodeTimer = setTimeout(() => {
-					this.geocodeCampaign(newVal);
+					this.geocodeCampaign(query);
 				}, 800);
 			}
 		}
@@ -642,6 +874,14 @@ export default {
 		this.loadCampaigns();
 		this.loadCampaignTypes();
 		this.loadSkills();
+		this.loadLocationOptions();
+	},
+	beforeUnmount() {
+		if (this._searchTimer) clearTimeout(this._searchTimer);
+		if (this.campaignGeocodeTimer) clearTimeout(this.campaignGeocodeTimer);
+		if (this.locationSuggestionTimer) clearTimeout(this.locationSuggestionTimer);
+		this.releaseCampaignImageObjectUrls();
+		this.destroyCampaignMap();
 	},
 	methods: {
 		// ===== Data Loading =====
@@ -689,19 +929,259 @@ export default {
 				console.error('Lỗi tải kỹ năng:', err);
 			}
 		},
+		async loadLocationOptions() {
+			try {
+				const [regionRes, provinceRes] = await Promise.allSettled([
+					api.get('/danh-muc/khu-vuc'),
+					api.get('/danh-muc/tinh-thanh'),
+				]);
+				const options = [];
+				const pushOption = (item, source, latitude = null, longitude = null) => {
+					const label = String(item?.ten || '').trim();
+					if (!label) return;
+					options.push({
+						key: `${source}-${item.id}-${label}`,
+						label,
+						value: label,
+						searchText: label,
+						source,
+						meta: '',
+						latitude: latitude === null || latitude === undefined || latitude === '' ? null : Number(latitude),
+						longitude: longitude === null || longitude === undefined || longitude === '' ? null : Number(longitude),
+						searchIndex: this.buildLocationSearchIndex(label),
+					});
+				};
+
+				if (regionRes.status === 'fulfilled' && regionRes.value.data?.status === 1) {
+					regionRes.value.data.data.forEach((item) => pushOption(item, 'internal'));
+				}
+
+				if (provinceRes.status === 'fulfilled' && provinceRes.value.data?.status === 1) {
+					provinceRes.value.data.data.forEach((item) => pushOption(item, 'province', item.vi_do, item.kinh_do));
+				}
+
+				this.locationOptions = this.mergeLocationSuggestions(options);
+			} catch (err) {
+				console.error('Lá»—i táº£i danh sÃ¡ch Ä‘á»‹a Ä‘iá»ƒm:', err);
+				this.locationOptions = [];
+			}
+		},
+		normalizeLocationSearch(value) {
+			return String(value || '')
+				.normalize('NFD')
+				.replace(/[\u0300-\u036f]/g, '')
+				.toLowerCase()
+				.replace(/\u0111/g, 'd')
+				.replace(/[^a-z0-9]+/g, ' ')
+				.trim();
+		},
+		buildLocationSearchIndex(label) {
+			const normalized = this.normalizeLocationSearch(label);
+			const aliases = [normalized];
+			if (normalized.includes('ho chi minh')) {
+				aliases.push('hcm', 'tphcm', 'tp hcm', 'ho chi minh', 'sai gon', 'saigon');
+			}
+			if (normalized === 'ha noi') aliases.push('hn');
+			if (normalized === 'da nang') aliases.push('dn');
+			if (normalized.startsWith('tp ')) {
+				aliases.push(normalized.replace(/^tp\s+/, ''));
+			}
+			if (normalized.startsWith('thanh pho ')) {
+				aliases.push(normalized.replace(/^thanh pho\s+/, ''));
+			}
+			return Array.from(new Set(aliases)).join(' ');
+		},
+		scoreLocationSuggestion(option, normalizedQuery) {
+			const searchIndex = option.searchIndex || this.buildLocationSearchIndex(option.label);
+			if (!normalizedQuery) return 0;
+			if (searchIndex === normalizedQuery) return 0;
+			if (searchIndex.startsWith(normalizedQuery)) return 1;
+			if (searchIndex.includes(` ${normalizedQuery}`)) return 2;
+			const idx = searchIndex.indexOf(normalizedQuery);
+			return idx === -1 ? Number.MAX_SAFE_INTEGER : 10 + idx;
+		},
+		buildLocalLocationSuggestions(query) {
+			const normalizedQuery = this.normalizeLocationSearch(query);
+			if (!normalizedQuery) return [];
+
+			return [...this.locationOptions]
+				.filter((option) => (option.searchIndex || '').includes(normalizedQuery))
+				.sort((a, b) => {
+					const scoreDiff = this.scoreLocationSuggestion(a, normalizedQuery) - this.scoreLocationSuggestion(b, normalizedQuery);
+					if (scoreDiff !== 0) return scoreDiff;
+					if (a.source !== b.source) return a.source === 'province' ? -1 : 1;
+					return a.label.localeCompare(b.label, 'vi');
+				})
+				.slice(0, 6);
+		},
+		mergeLocationSuggestions(...groups) {
+			const deduped = new Map();
+			groups
+				.flat()
+				.filter(Boolean)
+				.forEach((item) => {
+					const key = this.normalizeLocationSearch(item.value || item.label);
+					if (!key) return;
+					const existing = deduped.get(key);
+					if (!existing || this.getLocationSuggestionPriority(item) > this.getLocationSuggestionPriority(existing)) {
+						deduped.set(key, item);
+					}
+				});
+			return Array.from(deduped.values());
+		},
+		getLocationSuggestionPriority(item) {
+			return { province: 3, internal: 2, map: 1 }[item?.source] || 0;
+		},
+		queueLocationSuggestions(query) {
+			const localSuggestions = this.buildLocalLocationSuggestions(query);
+			this.locationSuggestions = localSuggestions;
+			this.locationSuggestionsVisible = true;
+			this.locationSuggestionIndex = localSuggestions.length ? 0 : -1;
+			this.locationSuggestionLoading = query.length >= 2;
+
+			if (query.length < 2) {
+				this.locationSuggestionLoading = false;
+				return;
+			}
+
+			const requestId = ++this.locationSuggestionRequestId;
+			this.locationSuggestionTimer = setTimeout(() => {
+				this.fetchRemoteLocationSuggestions(query, requestId);
+			}, 250);
+		},
+		async fetchRemoteLocationSuggestions(query, requestId) {
+			try {
+				const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(query)}&countrycodes=vn&limit=5`;
+				const res = await fetch(url, { headers: { 'Accept-Language': 'vi' } });
+				const data = await res.json();
+				if (requestId !== this.locationSuggestionRequestId || this.normalizeLocationSearch(this.formData.location) !== this.normalizeLocationSearch(query)) {
+					return;
+				}
+
+				const remoteSuggestions = (Array.isArray(data) ? data : [])
+					.map((item) => this.mapRemoteLocationSuggestion(item))
+					.filter(Boolean);
+
+				this.locationSuggestions = this.mergeLocationSuggestions(this.buildLocalLocationSuggestions(query), remoteSuggestions).slice(0, 8);
+				this.locationSuggestionIndex = this.locationSuggestions.length ? 0 : -1;
+			} catch (_err) {
+				if (requestId === this.locationSuggestionRequestId) {
+					this.locationSuggestions = this.buildLocalLocationSuggestions(query);
+				}
+			} finally {
+				if (requestId === this.locationSuggestionRequestId) {
+					this.locationSuggestionLoading = false;
+				}
+			}
+		},
+		mapRemoteLocationSuggestion(item) {
+			if (!item?.display_name) return null;
+			const address = item.address || {};
+			const parts = [
+				address.suburb,
+				address.city_district,
+				address.county,
+				address.city,
+				address.state,
+			]
+				.filter(Boolean)
+				.filter((value, index, arr) => arr.findIndex((candidate) => this.normalizeLocationSearch(candidate) === this.normalizeLocationSearch(value)) === index);
+			const label = parts.slice(0, 2).join(', ') || item.display_name.split(',').slice(0, 2).join(', ').trim();
+			const selectedValue = item.display_name.split(',').slice(0, 4).join(', ').trim() || label;
+			return {
+				key: `remote-${item.place_id}`,
+				label,
+				value: selectedValue,
+				meta: item.display_name.split(',').slice(0, 4).join(', ').trim(),
+				searchText: item.display_name,
+				source: 'map',
+				latitude: Number(item.lat),
+				longitude: Number(item.lon),
+				searchIndex: this.buildLocationSearchIndex(label),
+			};
+		},
+		handleLocationInput() {
+			this.formErrors.location = '';
+		},
+		handleLocationFocus() {
+			if (this.formData.location?.trim()) {
+				this.queueLocationSuggestions(this.formData.location.trim());
+			}
+		},
+		handleLocationBlur() {
+			setTimeout(() => {
+				this.locationSuggestionsVisible = false;
+				this.locationSuggestionIndex = -1;
+			}, 150);
+		},
+		handleLocationKeydown(event) {
+			if (!this.locationSuggestionsVisible || !this.locationSuggestions.length) {
+				if (event.key === 'Escape') this.locationSuggestionsVisible = false;
+				return;
+			}
+
+			if (event.key === 'ArrowDown') {
+				event.preventDefault();
+				this.locationSuggestionIndex = (this.locationSuggestionIndex + 1) % this.locationSuggestions.length;
+				return;
+			}
+
+			if (event.key === 'ArrowUp') {
+				event.preventDefault();
+				this.locationSuggestionIndex = this.locationSuggestionIndex <= 0
+					? this.locationSuggestions.length - 1
+					: this.locationSuggestionIndex - 1;
+				return;
+			}
+
+			if (event.key === 'Enter' && this.locationSuggestionIndex >= 0) {
+				event.preventDefault();
+				this.selectLocationSuggestion(this.locationSuggestions[this.locationSuggestionIndex]);
+				return;
+			}
+
+			if (event.key === 'Escape') {
+				this.locationSuggestionsVisible = false;
+				this.locationSuggestionIndex = -1;
+			}
+		},
+		selectLocationSuggestion(suggestion) {
+			if (!suggestion) return;
+			this._applyingLocationSuggestion = true;
+			this.formData.location = suggestion.value;
+			this.locationSuggestionsVisible = false;
+			this.locationSuggestionIndex = -1;
+			this.locationSuggestionLoading = false;
+
+			if (Number.isFinite(suggestion.latitude) && Number.isFinite(suggestion.longitude)) {
+				this.updateCampaignMapPosition(suggestion.latitude, suggestion.longitude);
+				this.campaignGeocodeStatus = 'success';
+				this.campaignGeocodeMessage = `${this.$t('coordinator.locationFound')} ${suggestion.label}`;
+				return;
+			}
+
+			this.geocodeCampaign(suggestion.searchText || suggestion.value);
+		},
+		getLocationSuggestionSourceLabel(source) {
+			if (source === 'map') return this.$t('coordinator.locationSourceMap');
+			return this.$t('coordinator.locationSourceInternal');
+		},
 
 		// ===== Mapping helpers =====
 		mapCampaignFromApi(cd) {
 			const loai = cd.loai_chien_dich;
-			const images = Array.isArray(cd.danh_sach_anh) && cd.danh_sach_anh.length
-				? cd.danh_sach_anh
-				: (cd.anh_bia ? [cd.anh_bia] : []);
+			const rawImages = Array.isArray(cd.danh_sach_anh) ? cd.danh_sach_anh : [];
+			const { coverImage, detailImages, allImages } = this.splitCampaignImages({
+				coverUrl: cd.anh_bia,
+				images: rawImages,
+			});
 			return {
 				id: cd.id,
 				title: cd.tieu_de,
 				description: cd.mo_ta || '',
-				coverUrl: images[0] || cd.anh_bia || null,
-				images,
+				descriptionPreview: buildCampaignDescriptionPreview(cd.mo_ta),
+				coverUrl: coverImage,
+				images: allImages.length ? allImages : [coverImage, ...detailImages].filter(Boolean),
 				category: cd.loai_chien_dich_id || '',
 				priority: PRIORITY_MAP[cd.muc_do_uu_tien] || 'medium',
 				location: cd.dia_diem,
@@ -738,9 +1218,21 @@ export default {
 		getPriorityLabel(p) { return this.$t(`priorities.${p}`); },
 		getPriorityClass(p) { return { urgent: 'bg-danger text-white', high: 'bg-warning text-dark', medium: 'bg-info text-white', low: 'bg-light text-muted border' }[p] || 'bg-secondary'; },
 		getStatusLabel(s) { return this.$t(`statuses.${s}`); },
-		getStatusClass(s) { return { approved: 'bg-info text-white', active: 'bg-success text-white', pending: 'bg-warning text-dark', completed: 'bg-secondary text-white', pending_cancel: 'bg-orange text-white', cancelled: 'bg-danger bg-opacity-75 text-white', rejected: 'bg-dark text-white', draft: 'bg-light text-dark border' }[s] || 'bg-secondary'; },
+		getStatusClass(s) { return { approved: 'bg-info text-white', active: 'bg-success text-white', pending: 'bg-warning text-dark', completed: 'bg-secondary text-white', pending_cancel: 'pending-cancel-badge text-white', cancelled: 'bg-danger bg-opacity-75 text-white', rejected: 'bg-dark text-white', draft: 'bg-light text-dark border' }[s] || 'bg-secondary'; },
 		getStatusIcon(s) { return { approved: 'fa-solid fa-badge-check', active: 'fa-solid fa-circle-play', pending: 'fa-solid fa-hourglass-half', completed: 'fa-solid fa-circle-check', pending_cancel: 'fa-solid fa-clock-rotate-left', cancelled: 'fa-solid fa-ban', rejected: 'fa-solid fa-circle-xmark', draft: 'fa-solid fa-file-lines' }[s] || ''; },
 		getProgress(c) { return c.maxVolunteers ? Math.round(c.registered / c.maxVolunteers * 100) : 0; },
+		canEditCampaign(campaign) {
+			return this.canManageCampaigns && !['pending_cancel', 'cancelled'].includes(campaign.status);
+		},
+		canStartCampaign(campaign) {
+			return this.canManageCampaigns && campaign.status === 'approved';
+		},
+		canDeleteCampaign(campaign) {
+			return this.canManageCampaigns && !['pending_cancel', 'cancelled'].includes(campaign.status);
+		},
+		campaignHasCover(campaign) {
+			return Boolean(campaign?.coverUrl || campaign?.images?.[0]);
+		},
 		getCampaignCoverStyle(campaign, variant = 'banner') {
 			const coverUrl = campaign.coverUrl || campaign.images?.[0] || null;
 			if (coverUrl) {
@@ -756,38 +1248,69 @@ export default {
 
 		// ===== Form =====
 		resetForm() {
+			this.releaseCampaignImageObjectUrls();
 			this.formErrors = {};
 			this.formData = {
 				title: '', description: '', category: '', priority: '',
+				descriptionForm: this.createDescriptionForm(),
 				location: '', latitude: null, longitude: null,
 				startDate: '', endDate: '', maxVolunteers: null, minVolunteers: null, requiredSkills: [],
 				coverUrl: null,
 				images: [],
-				existingImages: [],
-				newImages: [],
-				previewImages: [],
+				existingCoverImage: null,
+				coverImageFile: null,
+				coverPreviewUrl: '',
+				coverPreviewImage: null,
+				existingDetailImages: [],
+				detailImages: [],
+				detailImageInputs: this.createCampaignImageInputs(3),
+				detailPreviewImages: [],
 			};
+			this.locationSuggestions = [];
+			this.locationSuggestionsVisible = false;
+			this.locationSuggestionIndex = -1;
+			this.locationSuggestionLoading = false;
 			this.campaignGeocodeStatus = '';
 			this.campaignGeocodeMessage = '';
 			this.destroyCampaignMap();
 		},
 		openCreateModal() { this.isEditing = false; this.resetForm(); new bootstrap.Modal(this.$refs.campaignModal).show(); },
 		editCampaign(c) {
+			if (!this.canEditCampaign(c)) return;
+			this.releaseCampaignImageObjectUrls();
 			this.isEditing = true;
 			this._justOpenedEdit = true;
+			const { coverImage: existingCoverImage, detailImages: existingDetailImages, allImages: images } = this.splitCampaignImages({
+				coverUrl: c.coverUrl,
+				images: c.images || [],
+			});
 			this.formData = {
 				...c,
+				descriptionForm: this.parseDescriptionForm(c.description),
 				requiredSkills: [...c.requiredSkills],
-				coverUrl: c.coverUrl || c.images?.[0] || null,
-				images: [...(c.images || [])],
-				existingImages: [...(c.images || [])],
-				newImages: [],
-				previewImages: (c.images || []).map((url, index) => ({
-					key: `existing-${index}-${url}`,
-					type: 'existing',
+				coverUrl: existingCoverImage,
+				images,
+				existingCoverImage,
+				coverImageFile: null,
+				coverPreviewUrl: '',
+				coverPreviewImage: existingCoverImage ? {
+					key: `existing-cover-${existingCoverImage}`,
+					type: 'existing-cover',
+					url: existingCoverImage,
+				} : null,
+				existingDetailImages,
+				detailImages: [],
+				detailImageInputs: this.createCampaignImageInputsFromUrls(existingDetailImages, 3),
+				detailPreviewImages: existingDetailImages.map((url, index) => ({
+					key: `existing-detail-${index}-${url}`,
+					type: 'existing-detail',
 					url,
 				})),
 			};
+			this.locationSuggestions = [];
+			this.locationSuggestionsVisible = false;
+			this.locationSuggestionIndex = -1;
+			this.locationSuggestionLoading = false;
 			new bootstrap.Modal(this.$refs.campaignModal).show();
 			if (c.latitude && c.longitude) {
 				setTimeout(() => {
@@ -805,41 +1328,264 @@ export default {
 				this.loadCampaigns(page);
 			}
 		},
-		onCampaignImagesChange(e) {
-			const files = Array.from(e.target.files || []);
-			if (!files.length) return;
+		createDescriptionForm() {
+			return DESCRIPTION_FIELD_CONFIG.reduce((accumulator, field) => {
+				accumulator[field.key] = '';
+				return accumulator;
+			}, {});
+		},
+		parseDescriptionForm(description) {
+			const fallback = this.createDescriptionForm();
+			const items = String(description || '')
+				.replace(/\r/g, '')
+				.split('\n')
+				.map((item) => item.replace(/^\s*[-•]\s*/, '').trim())
+				.filter(Boolean);
 
-			const validFiles = files.filter((file) => file.type.startsWith('image/'));
-			if (!validFiles.length) return;
+			if (!items.length) {
+				return fallback;
+			}
 
-			this.formData.newImages = [...this.formData.newImages, ...validFiles];
-			this.syncCampaignPreviewImages();
-			this.formErrors.images = '';
+			const matchedKeys = new Set();
+			items.forEach((item) => {
+				DESCRIPTION_FIELD_CONFIG.forEach((field) => {
+					const prefix = DESCRIPTION_FIELD_PREFIXES[field.key];
+					if (!prefix || matchedKeys.has(field.key)) return;
+					if (item.startsWith(prefix)) {
+						fallback[field.key] = item.slice(prefix.length).replace(/^[:\s]+/, '').replace(/[.]+$/, '').trim();
+						matchedKeys.add(field.key);
+					}
+				});
+			});
+
+			if (matchedKeys.size === 0) {
+				DESCRIPTION_FIELD_CONFIG.forEach((field, index) => {
+					fallback[field.key] = items[index] || '';
+				});
+			}
+
+			if (matchedKeys.size > 0 && matchedKeys.size < DESCRIPTION_FIELD_CONFIG.length) {
+				const remainingItems = items.filter((item) => !Array.from(matchedKeys).some((key) => item.startsWith(DESCRIPTION_FIELD_PREFIXES[key])));
+				DESCRIPTION_FIELD_CONFIG.forEach((field) => {
+					if (!fallback[field.key] && remainingItems.length) {
+						fallback[field.key] = remainingItems.shift() || '';
+					}
+				});
+			}
+
+			return fallback;
+		},
+		normalizeDescriptionFieldValue(value) {
+			return String(value || '')
+				.replace(/\s+/g, ' ')
+				.trim()
+				.replace(/[.]+$/, '');
+		},
+		buildDescriptionPayload() {
+			return DESCRIPTION_FIELD_CONFIG
+				.map((field) => {
+					const value = this.normalizeDescriptionFieldValue(this.formData.descriptionForm?.[field.key]);
+					if (!value) return '';
+					return field.sentence.replace('{value}', value);
+				})
+				.filter(Boolean)
+				.join(' ');
+		},
+		syncDescriptionValue() {
+			this.formData.description = this.buildDescriptionPayload();
+		},
+		parseDescriptionForm(description) {
+			const fallback = this.createDescriptionForm();
+			const extractedSections = extractCampaignDescriptionSections(description);
+			if (extractedSections.length) {
+				extractedSections.forEach((section) => {
+					if (Object.prototype.hasOwnProperty.call(fallback, section.key)) {
+						fallback[section.key] = section.value || '';
+					}
+				});
+				return fallback;
+			}
+
+			const items = String(description || '')
+				.replace(/\r/g, '')
+				.split('\n')
+				.map((item) => item.replace(/^\s*[-•]\s*/, '').trim())
+				.filter(Boolean);
+
+			DESCRIPTION_FIELD_CONFIG.forEach((field, index) => {
+				fallback[field.key] = items[index] || '';
+			});
+
+			return fallback;
+		},
+		createCampaignImageInput(file = null, existingUrl = '') {
+			return {
+				id: `campaign-image-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+				file,
+				existingUrl,
+				previewUrl: file ? URL.createObjectURL(file) : (existingUrl || ''),
+			};
+		},
+		splitCampaignImages({ coverUrl = null, images = [] } = {}) {
+			const normalizedImages = (Array.isArray(images) ? images : [])
+				.map((url) => (typeof url === 'string' ? url.trim() : ''))
+				.filter(Boolean);
+			const normalizedCoverUrl = typeof coverUrl === 'string' ? coverUrl.trim() : '';
+			const coverImage = normalizedCoverUrl || normalizedImages[0] || null;
+			const remainingImages = [...normalizedImages];
+			if (coverImage) {
+				const coverIndex = remainingImages.findIndex((url) => url === coverImage);
+				if (coverIndex >= 0) {
+					remainingImages.splice(coverIndex, 1);
+				}
+			}
+			const detailImages = remainingImages.filter(Boolean);
+			const allImages = [coverImage, ...detailImages].filter(Boolean);
+			return { coverImage, detailImages, allImages };
+		},
+		createCampaignImageInputs(count = 3) {
+			return Array.from({ length: count }, () => this.createCampaignImageInput());
+		},
+		createCampaignImageInputsFromUrls(urls = [], minCount = 3) {
+			const inputs = (Array.isArray(urls) ? urls : [])
+				.filter(Boolean)
+				.map((url) => this.createCampaignImageInput(null, url));
+			while (inputs.length < minCount) {
+				inputs.push(this.createCampaignImageInput());
+			}
+			return inputs;
+		},
+		revokeCampaignImageUrl(url) {
+			if (typeof url === 'string' && url.startsWith('blob:')) {
+				URL.revokeObjectURL(url);
+			}
+		},
+		releaseCampaignImageObjectUrls() {
+			this.revokeCampaignImageUrl(this.formData?.coverPreviewUrl);
+			(this.formData?.detailImageInputs || []).forEach((input) => this.revokeCampaignImageUrl(input.previewUrl));
+		},
+		ensureDetailImageInputs(minCount = 3) {
+			if (!Array.isArray(this.formData.detailImageInputs)) {
+				this.formData.detailImageInputs = [];
+			}
+			while (this.formData.detailImageInputs.length < minCount) {
+				this.formData.detailImageInputs.push(this.createCampaignImageInput());
+			}
+		},
+		getTotalDetailImageCount() {
+			return (this.formData.detailImageInputs || []).filter((item) => item.file || item.existingUrl).length;
+		},
+		onCoverImageChange(e) {
+			const file = Array.from(e.target.files || [])[0] || null;
+			if (file && !file.type.startsWith('image/')) {
+				this.formErrors.coverImage = 'Vui lòng chọn tệp hình ảnh hợp lệ.';
+				e.target.value = '';
+				return;
+			}
+
+			this.revokeCampaignImageUrl(this.formData.coverPreviewUrl);
+			this.formData.coverImageFile = file;
+			this.formData.coverPreviewUrl = file ? URL.createObjectURL(file) : '';
+			this.syncCampaignImageState();
+			this.formErrors.coverImage = '';
 			e.target.value = '';
 		},
-		syncCampaignPreviewImages() {
-			const existing = (this.formData.existingImages || []).map((url, index) => ({
-				key: `existing-${index}-${url}`,
-				type: 'existing',
+		removeCoverImage() {
+			this.revokeCampaignImageUrl(this.formData.coverPreviewUrl);
+			const hadNewCover = Boolean(this.formData.coverImageFile);
+			this.formData.coverImageFile = null;
+			this.formData.coverPreviewUrl = '';
+			if (!hadNewCover) {
+				this.formData.existingCoverImage = null;
+			}
+			this.syncCampaignImageState();
+		},
+		addDetailImageInput() {
+			this.ensureDetailImageInputs();
+			this.formData.detailImageInputs.push(this.createCampaignImageInput());
+		},
+		onDetailImagesChange(e, inputId) {
+			const file = Array.from(e.target.files || [])[0] || null;
+			const targetInput = (this.formData.detailImageInputs || []).find((item) => item.id === inputId);
+			if (!targetInput) return;
+			if (file && !file.type.startsWith('image/')) {
+				this.formErrors.detailImages = 'Vui lòng chọn tệp hình ảnh hợp lệ.';
+				e.target.value = '';
+				return;
+			}
+
+			this.revokeCampaignImageUrl(targetInput.previewUrl);
+			targetInput.file = file;
+			targetInput.existingUrl = '';
+			targetInput.previewUrl = file ? URL.createObjectURL(file) : '';
+			this.syncCampaignImageState();
+			this.formErrors.detailImages = '';
+			e.target.value = '';
+		},
+		removeDetailImageInput(inputId) {
+			const removedInput = (this.formData.detailImageInputs || []).find((item) => item.id === inputId);
+			if (removedInput) {
+				this.revokeCampaignImageUrl(removedInput.previewUrl);
+			}
+			this.formData.detailImageInputs = (this.formData.detailImageInputs || []).filter((item) => item.id !== inputId);
+			this.ensureDetailImageInputs();
+			this.syncCampaignImageState();
+		},
+		syncCampaignImageState() {
+			this.ensureDetailImageInputs();
+			this.formData.detailImages = (this.formData.detailImageInputs || [])
+				.map((item) => item.file)
+				.filter(Boolean);
+			this.formData.existingDetailImages = (this.formData.detailImageInputs || [])
+				.map((item) => item.existingUrl)
+				.filter(Boolean);
+			this.formData.coverPreviewImage = this.formData.coverImageFile
+				? {
+					key: `new-cover-${this.formData.coverImageFile.name}-${this.formData.coverImageFile.size}`,
+					type: 'new-cover',
+					url: this.formData.coverPreviewUrl,
+					file: this.formData.coverImageFile,
+				}
+				: (this.formData.existingCoverImage
+					? {
+						key: `existing-cover-${this.formData.existingCoverImage}`,
+						type: 'existing-cover',
+						url: this.formData.existingCoverImage,
+					}
+					: null);
+
+			const existingDetailImages = (this.formData.existingDetailImages || []).map((url, index) => ({
+				key: `existing-detail-${index}-${url}`,
+				type: 'existing-detail',
 				url,
 			}));
-			const news = (this.formData.newImages || []).map((file, index) => ({
-				key: `new-${index}-${file.name}-${file.size}`,
-				type: 'new',
-				url: URL.createObjectURL(file),
-				file,
-			}));
-			this.formData.previewImages = [...existing, ...news];
-			this.formData.images = this.formData.previewImages.map((item) => item.url);
-			this.formData.coverUrl = this.formData.previewImages[0]?.url || null;
+			const newDetailImages = (this.formData.detailImageInputs || [])
+				.filter((item) => item.file && item.previewUrl)
+				.map((item, index) => ({
+					key: `new-detail-${index}-${item.file.name}-${item.file.size}`,
+					type: 'new-detail',
+					url: item.previewUrl,
+					file: item.file,
+				}));
+			this.formData.detailPreviewImages = [...existingDetailImages, ...newDetailImages];
+			this.formData.coverUrl = this.formData.coverPreviewImage?.url || null;
+			this.formData.images = [
+				this.formData.coverPreviewImage?.url,
+				...this.formData.detailPreviewImages.map((item) => item.url),
+			].filter(Boolean);
 		},
-		removeCampaignImage(image) {
-			if (image.type === 'existing') {
-				this.formData.existingImages = this.formData.existingImages.filter((url) => url !== image.url);
+		removeDetailImage(image) {
+			if (image.type === 'existing-detail') {
+				this.formData.existingDetailImages = this.formData.existingDetailImages.filter((url) => url !== image.url);
 			} else {
-				this.formData.newImages = this.formData.newImages.filter((file) => file !== image.file);
+				const removedInput = (this.formData.detailImageInputs || []).find((item) => item.file === image.file || item.previewUrl === image.url);
+				if (removedInput) {
+					this.revokeCampaignImageUrl(removedInput.previewUrl);
+				}
+				this.formData.detailImageInputs = (this.formData.detailImageInputs || []).filter((item) => item.file !== image.file && item.previewUrl !== image.url);
+				this.ensureDetailImageInputs();
 			}
-			this.syncCampaignPreviewImages();
+			this.syncCampaignImageState();
 		},
 		validateCampaignForm() {
 			const errors = {};
@@ -847,12 +1593,16 @@ export default {
 			today.setHours(0, 0, 0, 0);
 			const startDate = this.formData.startDate ? new Date(this.formData.startDate) : null;
 			const endDate = this.formData.endDate ? new Date(this.formData.endDate) : null;
+			const descriptionPayload = this.buildDescriptionPayload();
 
 			if (!this.formData.title?.trim()) errors.title = 'Vui lòng nhập tên chiến dịch.';
 			else if (this.formData.title.trim().length < 5) errors.title = 'Tên chiến dịch phải có ít nhất 5 ký tự.';
 
-			if (!this.formData.description?.trim()) errors.description = 'Vui lòng nhập mô tả chiến dịch.';
-			else if (this.formData.description.trim().length < 20) errors.description = 'Mô tả chiến dịch phải có ít nhất 20 ký tự.';
+			if (!descriptionPayload.trim()) {
+				errors.description = 'Vui lòng hoàn thiện phần mô tả chiến dịch.';
+			} else if (descriptionPayload.replace(/\s/g, '').length < 60) {
+				errors.description = 'Mô tả hoàn chỉnh còn quá ngắn, vui lòng nhập đầy đủ hơn.';
+			}
 
 			if (!this.formData.category) errors.category = 'Vui lòng chọn loại chiến dịch.';
 			if (!this.formData.priority) errors.priority = 'Vui lòng chọn mức độ ưu tiên.';
@@ -870,12 +1620,13 @@ export default {
 			if (!this.formData.minVolunteers || this.formData.minVolunteers < 1) errors.minVolunteers = 'Số lượng tối thiểu phải lớn hơn 0.';
 			else if (this.formData.maxVolunteers && this.formData.minVolunteers > this.formData.maxVolunteers) errors.minVolunteers = 'Số lượng tối thiểu không được lớn hơn số lượng tối đa.';
 
-			if ((this.formData.previewImages || []).length > 10) errors.images = 'Tối đa 10 hình ảnh cho mỗi chiến dịch.';
+			if (!this.formData.coverPreviewImage) errors.coverImage = 'Vui lòng chọn ảnh bìa cho chiến dịch.';
+			if (this.getTotalDetailImageCount() < 3) errors.detailImages = 'Vui lòng chọn tối thiểu 3 ảnh mô tả chiến dịch.';
 
 			this.formErrors = errors;
+			this.formData.description = descriptionPayload;
 			return Object.keys(errors).length === 0;
 		},
-
 		async saveCampaign() {
 			if (!this.validateCampaignForm()) {
 				if (this.toast) this.toast.showToast('error', 'Lỗi', this.$t('coordinator.fillAllFields'));
@@ -885,6 +1636,7 @@ export default {
 			this.isSaving = true;
 
 			const payload = new FormData();
+			this.syncDescriptionValue();
 			payload.append('tieu_de', this.formData.title);
 			payload.append('mo_ta', this.formData.description || '');
 			if (this.formData.category) payload.append('loai_chien_dich_id', this.formData.category);
@@ -897,13 +1649,15 @@ export default {
 			payload.append('so_luong_toi_thieu', this.formData.minVolunteers || 1);
 			payload.append('muc_do_uu_tien', PRIORITY_MAP_REVERSE[this.formData.priority] || 'trung_binh');
 			(this.formData.requiredSkills || []).forEach((id, index) => payload.append(`ky_nang_ids[${index}]`, id));
-			(this.formData.existingImages || []).forEach((url, index) => payload.append(`danh_sach_anh_hien_tai[${index}]`, url));
-			if ((this.formData.existingImages || []).length === 0 && this.formData.newImages.length > 0) {
-				payload.append('anh_bia', this.formData.newImages[0]);
-				this.formData.newImages.slice(1).forEach((file, index) => payload.append(`anh_phu[${index}]`, file));
-			} else {
-				this.formData.newImages.forEach((file, index) => payload.append(`anh_phu[${index}]`, file));
+			const existingImages = [
+				...(this.formData.coverImageFile ? [] : (this.formData.existingCoverImage ? [this.formData.existingCoverImage] : [])),
+				...(this.formData.existingDetailImages || []),
+			];
+			existingImages.forEach((url, index) => payload.append(`danh_sach_anh_hien_tai[${index}]`, url));
+			if (this.formData.coverImageFile) {
+				payload.append('anh_bia', this.formData.coverImageFile);
 			}
+			(this.formData.detailImages || []).forEach((file, index) => payload.append(`anh_phu[${index}]`, file));
 
 			try {
 				if (this.isEditing) {
@@ -1155,6 +1909,10 @@ export default {
 </script>
 
 <style scoped>
+.campaign-modal-2xl {
+	max-width: min(1480px, calc(100vw - 2rem));
+}
+
 .campaign-avatar { width: 40px; height: 40px; }
 .campaign-grid-banner { height: 90px; }
 .min-w-0 { min-width: 0; }
@@ -1170,6 +1928,69 @@ export default {
 .skill-tag { transition: all 0.15s ease; }
 .skill-tag:hover { opacity: 0.85; }
 
+.pending-cancel-badge {
+	background-color: #fd7e14 !important;
+}
+
+.upload-media-card {
+	border: 1px solid rgba(15, 23, 42, 0.12);
+	border-radius: 0.5rem;
+	background: #fff;
+	overflow: hidden;
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.upload-media-card.is-invalid {
+	border-color: #dc3545;
+}
+
+.upload-media-preview {
+	position: relative;
+	height: 190px;
+	background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+}
+
+.upload-media-image {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.upload-media-placeholder {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.5rem;
+	color: #64748b;
+	font-size: 0.92rem;
+	font-weight: 500;
+	text-align: center;
+	padding: 1rem;
+}
+
+.upload-media-placeholder i {
+	font-size: 2rem;
+	color: #94a3b8;
+}
+
+.upload-media-body {
+	padding: 0.9rem;
+}
+
+.upload-media-body .form-control,
+.upload-media-body .btn {
+	border-radius: 0.375rem;
+}
+
+@media (max-width: 767.98px) {
+	.upload-media-preview {
+		height: 170px;
+	}
+}
+
 .nav-tabs-custom .nav-link { border: none; border-bottom: 3px solid transparent; border-radius: 0; font-size: 13px; }
 .nav-tabs-custom .nav-link.active { border-bottom-color: #0d6efd; background: transparent; }
 .nav-tabs-custom .nav-link:hover:not(.active) { border-bottom-color: #dee2e6; }
@@ -1178,6 +1999,48 @@ export default {
 	height: 250px;
 	width: 100%;
 	z-index: 0;
+}
+
+.location-suggestions-dropdown {
+	position: absolute;
+	top: calc(100% + 0.35rem);
+	left: 0;
+	right: 0;
+	z-index: 12;
+	background: #fff;
+	border: 1px solid rgba(15, 23, 42, 0.08);
+	border-radius: 0.9rem;
+	max-height: 280px;
+	overflow-y: auto;
+}
+
+.location-suggestion-item {
+	padding: 0.75rem 0.9rem;
+	border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+	cursor: pointer;
+	transition: background-color 0.15s ease;
+}
+
+.location-suggestion-item:last-child {
+	border-bottom: none;
+}
+
+.location-suggestion-item:hover,
+.location-suggestion-item.active {
+	background: rgba(13, 110, 253, 0.08);
+}
+
+.location-suggestion-source {
+	background: rgba(13, 110, 253, 0.1);
+	color: #0d6efd;
+	font-size: 11px;
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.location-suggestion-empty {
+	padding: 0.9rem;
+	font-size: 13px;
 }
 
 @media (max-width: 575.98px) {

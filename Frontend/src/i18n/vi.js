@@ -64,6 +64,7 @@ export default {
         download: 'Tải',
         settings: 'Cài đặt',
         understood: 'Đã hiểu',
+        refresh: 'Làm mới',
         completed: 'Hoàn thành',
         views: 'lượt xem',
         featured: 'Nổi bật',
@@ -778,6 +779,927 @@ export default {
         }
     },
 
+    // === Admin: Layout ===
+    admin: {
+        layout: {
+            panel: 'Admin Panel',
+            overview: 'TỔNG QUAN',
+            dashboard: 'Dashboard',
+            management: 'QUẢN LÝ',
+            users: 'Người dùng',
+            campaigns: 'Chiến dịch',
+            categories: 'Danh mục hệ thống',
+            articles: 'Bài viết',
+            aiSystem: 'HỆ THỐNG AI',
+            aiSuggest: 'AI Gợi ý TNV',
+            reports: 'BÁO CÁO',
+            statistics: 'Dashboard KDV',
+            aiEvaluation: 'Đánh giá AI',
+            admin: 'Admin',
+            adminRole: 'Quản trị viên',
+            reviewerRole: 'Kiểm duyệt viên',
+            searchPlaceholder: 'Tìm kiếm...',
+            homeView: 'Xem trang chủ',
+            settings: 'Cài đặt',
+            logout: 'Đăng xuất',
+            permissionSection: 'PHÂN QUYỀN',
+            permissions: 'Phân quyền KDV',
+            userPermissions: 'Phân quyền TNV',
+            notifications: {
+                title: 'Thông báo',
+                markAllRead: 'Đánh dấu tất cả đã đọc',
+                pendingCampaign: 'Chiến dịch Mùa hè xanh chờ xét duyệt',
+                pendingCampaignTime: '10 phút trước',
+                newRegistrations: 'Có 5 đăng ký TNV mới',
+                newRegistrationsTime: '1 giờ trước',
+                viewAll: 'Xem tất cả thông báo',
+            },
+        },
+        dashboard: {
+            title: 'Dashboard',
+            subtitle: 'Tổng quan hệ thống quản lý tình nguyện viên',
+            messages: {
+                loadFailed: 'Không thể tải dashboard'
+            },
+            trend: {
+                increase: 'Tăng {value} so với kỳ trước',
+                decrease: 'Giảm {value} so với kỳ trước',
+                noChange: 'Không đổi so với kỳ trước'
+            },
+            dateRange: {
+                last7Days: '7 ngày qua',
+                last30Days: '30 ngày qua',
+                last3Months: '3 tháng',
+                thisYear: 'Năm nay'
+            },
+            stats: {
+                totalUsers: 'Tổng người dùng',
+                activeCampaigns: 'Chiến dịch hoạt động',
+                pendingUsers: 'Tài khoản chờ duyệt',
+                publishedArticles: 'Bài viết đã đăng',
+                needsAction: 'Cần xử lý',
+                thisWeek: '+8 tuần này'
+            },
+            charts: {
+                systemActivity: 'Hoạt động hệ thống',
+                newRegistrations: 'Đăng ký mới',
+                campaigns: 'Chiến dịch',
+                registrationsLabel: 'đăng ký',
+                campaignsLabel: 'chiến dịch',
+                days: {
+                    mon: 'T2', tue: 'T3', wed: 'T4', thu: 'T5', fri: 'T6', sat: 'T7', sun: 'CN'
+                },
+                userDistribution: 'Phân bố người dùng',
+                total: 'Tổng cộng',
+                roles: {
+                    volunteer: 'Tình nguyện viên',
+                    coordinator: 'Kiểm duyệt viên',
+                    admin: 'Quản trị viên',
+                    pending: 'Chờ duyệt'
+                }
+            },
+            activity: {
+                close: 'Đóng danh sách',
+                empty: 'Không có dữ liệu chi tiết trong mốc thời gian này.',
+                registrationsTitle: 'Danh sách đăng ký mới - {label}',
+                campaignsTitle: 'Danh sách chiến dịch - {label}',
+                pagination: 'Trang {page} / {totalPages} · Hiển thị {from}-{to} / {total} mục',
+                table: {
+                    user: 'Người dùng',
+                    role: 'Vai trò',
+                    status: 'Trạng thái',
+                    time: 'Thời gian',
+                    detail: 'Chi tiết',
+                    campaign: 'Chiến dịch',
+                    creator: 'Người tạo'
+                }
+            },
+            recentUsers: {
+                title: 'Người dùng đăng ký gần đây',
+                empty: 'Chưa có người dùng đăng ký mới trong giai đoạn này.'
+            },
+            campaigns: {
+                title: 'Chiến dịch gần đây',
+                empty: 'Chưa có chiến dịch nào trong giai đoạn này.',
+                activeCountLabel: '{count} đang hoạt động'
+            },
+            modals: {
+                userTitle: 'Chi tiết người dùng',
+                campaignTitle: 'Chi tiết chiến dịch',
+                role: 'Vai trò',
+                status: 'Trạng thái',
+                phone: 'Số điện thoại',
+                notUpdated: 'Chưa cập nhật',
+                registeredAt: 'Thời gian đăng ký',
+                creator: 'Người tạo',
+                confirmedVolunteers: 'Tình nguyện viên xác nhận',
+                createdAt: 'Ngày tạo'
+            },
+            pendingApprovals: {
+                title: 'Tài khoản chờ duyệt',
+                viewAll: 'Xem tất cả',
+                approve: 'Duyệt',
+                approved: 'Đã duyệt tài khoản',
+                approvedDesc: 'đã được kích hoạt',
+                reject: 'Từ chối',
+                rejected: 'Đã từ chối tài khoản',
+                rejectedDesc: 'đã bị từ chối',
+                timeAgo: {
+                    hours: 'giờ trước',
+                    days: 'ngày trước'
+                }
+            },
+            recentCampaigns: {
+                title: 'Chiến dịch gần đây',
+                activeCount: 'đang hoạt động',
+                status: {
+                    recruiting: 'Đang tuyển',
+                    full: 'Đã đủ',
+                    completed: 'Hoàn thành'
+                }
+            }
+        },
+        userManagement: {
+            title: 'Quản lý người dùng',
+            subtitle: 'Quản lý tài khoản, vai trò, trạng thái hoạt động và xác thực email',
+            addUser: 'Thêm người dùng',
+            permissionButton: 'Phân quyền',
+            tabs: {
+                all: 'Tất cả',
+                pending: 'Chờ duyệt',
+                locked: 'Đã khóa'
+            },
+            filter: {
+                searchPlaceholder: 'Tìm theo tên, email...',
+                allRoles: 'Tất cả vai trò',
+                allStatuses: 'Tất cả trạng thái',
+                reset: 'Đặt lại'
+            },
+            roles: {
+                volunteer: 'Tình nguyện viên',
+                coordinator: 'Kiểm duyệt viên',
+                admin: 'Quản trị viên'
+            },
+            statuses: {
+                active: 'Hoạt động',
+                pending: 'Chờ duyệt',
+                locked: 'Đã khóa'
+            },
+            table: {
+                user: 'Người dùng',
+                role: 'Vai trò',
+                status: 'Trạng thái',
+                emailVerified: 'Xác thực email',
+                createdAt: 'Ngày tạo',
+                campaigns: 'Chiến dịch',
+                actions: 'Thao tác',
+                noPhone: 'Chưa có số điện thoại'
+            },
+            actions: {
+                view: 'Xem chi tiết',
+                edit: 'Chỉnh sửa',
+                approve: 'Duyệt',
+                lock: 'Khóa',
+                unlock: 'Mở khóa',
+                delete: 'Xóa'
+            },
+            emptyState: 'Không tìm thấy người dùng nào phù hợp',
+            emailVerified: {
+                yes: 'Đã xác thực',
+                no: 'Chưa xác thực'
+            },
+            pagination: {
+                showing: 'Hiển thị {from}-{to} / {total} người dùng'
+            },
+            modal: {
+                addUser: 'Thêm người dùng mới',
+                editUser: 'Chỉnh sửa người dùng',
+                fullName: 'Họ và tên',
+                fullNamePlaceholder: 'Nhập họ tên...',
+                email: 'Email',
+                emailPlaceholder: 'Nhập email...',
+                phone: 'Số điện thoại',
+                phonePlaceholder: 'Nhập số điện thoại...',
+                role: 'Vai trò',
+                password: 'Mật khẩu',
+                passwordOptional: 'Mật khẩu mới',
+                passwordPlaceholder: 'Nhập mật khẩu...',
+                status: 'Trạng thái',
+                emailVerified: 'Đánh dấu đã xác thực email',
+                cancel: 'Hủy',
+                createAccount: 'Tạo tài khoản',
+                update: 'Cập nhật',
+                close: 'Đóng'
+            },
+            validation: {
+                fullNameRequired: 'Vui lòng nhập họ tên',
+                emailRequired: 'Vui lòng nhập email',
+                emailInvalid: 'Email không hợp lệ',
+                passwordRequired: 'Vui lòng nhập mật khẩu'
+            },
+            toast: {
+                updateSuccessTitle: 'Cập nhật thành công',
+                updateSuccessMessage: 'Người dùng "{name}" đã được cập nhật',
+                createSuccessTitle: 'Tạo tài khoản thành công',
+                createSuccessMessage: 'Người dùng "{name}" đã được thêm vào hệ thống',
+                approveSuccessTitle: 'Đã duyệt tài khoản',
+                approveSuccessMessage: '"{name}" đã được kích hoạt',
+                lockSuccessTitle: 'Đã khóa tài khoản',
+                lockSuccessMessage: '"{name}" đã bị khóa',
+                unlockSuccessTitle: 'Đã mở khóa tài khoản',
+                unlockSuccessMessage: '"{name}" đã được mở khóa',
+                deleteSuccessTitle: 'Đã xóa người dùng',
+                deleteSuccessMessage: '"{name}" đã bị xóa khỏi hệ thống',
+                loadErrorTitle: 'Không thể tải danh sách người dùng',
+                loadErrorMessage: 'Vui lòng thử lại sau.',
+                saveErrorTitle: 'Không thể lưu thay đổi',
+                saveErrorMessage: 'Đã có lỗi xảy ra khi cập nhật dữ liệu người dùng.'
+            },
+            confirm: {
+                approveTitle: 'Duyệt tài khoản?',
+                approveMessage: 'Bạn có chắc chắn muốn duyệt tài khoản này?',
+                lockTitle: 'Khóa tài khoản?',
+                lockMessage: 'Người dùng sẽ không thể đăng nhập sau khi bị khóa.',
+                unlockTitle: 'Mở khóa tài khoản?',
+                unlockMessage: 'Người dùng sẽ có thể đăng nhập trở lại.',
+                deleteTitle: 'Xóa người dùng?',
+                deleteMessage: 'Hành động này không thể hoàn tác. Tất cả dữ liệu liên quan sẽ bị xóa.'
+            },
+            viewModal: {
+                title: 'Chi tiết người dùng'
+            }
+        },
+        permissions: {
+            title: 'Phân quyền kiểm duyệt viên',
+            subtitle: 'Màn này chỉ cấu hình quyền cho tài khoản kiểm duyệt viên. KDV chỉ còn màn Chiến dịch và các thao tác liên quan.',
+            badges: {
+                default: 'Vai trò KDV',
+                custom: 'Tùy chỉnh thao tác',
+            },
+            summary: {
+                totalAccounts: 'Tổng tài khoản KDV',
+                reviewers: 'Kiểm duyệt viên',
+                defaultMode: 'Đang dùng mặc định',
+                customMode: 'Đang tùy chỉnh',
+            },
+            filter: {
+                searchPlaceholder: 'Tìm theo tên, email...',
+                allRoles: 'Tất cả vai trò',
+                allStatuses: 'Tất cả trạng thái',
+                allModes: 'Tất cả chế độ',
+                reset: 'Đặt lại',
+            },
+            modes: {
+                default: 'Mặc định theo vai trò',
+                custom: 'Tùy chỉnh thủ công',
+            },
+            groups: {
+                dashboard: 'Dashboard',
+                campaignReview: 'Chiến dịch',
+            },
+            columns: {
+                access: 'Truy cập',
+                view: 'Xem',
+                manage: 'Quản lý',
+            },
+            actions: {
+                resetDefault: 'Về mặc định',
+                save: 'Lưu',
+            },
+            table: {
+                title: 'Ma trận phân quyền KDV',
+                summary: '{groups} nhóm chức năng · {permissions} quyền · Hiển thị {from}-{to} / {total} tài khoản',
+                rowsPerPage: 'Số dòng / trang',
+                currentAccount: 'Tài khoản hiện tại',
+                empty: 'Không tìm thấy tài khoản phù hợp để phân quyền.',
+                pagination: 'Trang {page} / {totalPages} · Đang hiển thị {from}-{to} / {total} tài khoản',
+                ariaPagination: 'Phân trang phân quyền KDV',
+                columns: {
+                    account: 'Tài khoản',
+                    role: 'Vai trò',
+                    status: 'Trạng thái',
+                    mode: 'Chế độ',
+                    totalPermissions: 'Tổng quyền',
+                    actions: 'Thao tác',
+                },
+            },
+            toast: {
+                loadErrorTitle: 'Không thể tải phân quyền',
+                loadErrorMessage: 'Vui lòng thử lại sau.',
+                saveSuccessTitle: 'Đã lưu phân quyền',
+                saveSuccessMessage: 'Phân quyền của "{name}" đã được cập nhật.',
+                resetSuccessTitle: 'Đã khôi phục mặc định',
+                resetSuccessMessage: 'Tài khoản "{name}" đang dùng lại gói quyền mặc định theo vai trò.',
+                saveErrorTitle: 'Không thể lưu phân quyền',
+                saveErrorMessage: 'Đã có lỗi xảy ra khi cập nhật phân quyền.',
+            },
+        },
+        userPermissions: {
+            title: 'Phân quyền tình nguyện viên',
+            subtitle: 'Cấu hình quyền cho các màn phía tình nguyện viên. Bỏ quyền xem sẽ ẩn menu và chặn truy cập màn hình tương ứng.',
+            badges: {
+                scope: 'Vai trò TNV',
+                separateTable: 'Theo từng màn',
+            },
+            summary: {
+                totalAccounts: 'Tổng tài khoản TNV',
+                volunteers: 'Tình nguyện viên',
+                defaultMode: 'Đang dùng mặc định',
+                customMode: 'Đang tùy chỉnh',
+            },
+            filter: {
+                searchPlaceholder: 'Tìm theo tên, email...',
+                allRoles: 'Tất cả vai trò',
+                allStatuses: 'Tất cả trạng thái',
+                allModes: 'Tất cả chế độ',
+                reset: 'Đặt lại',
+            },
+            modes: {
+                default: 'Mặc định theo vai trò',
+                custom: 'Tùy chỉnh thủ công',
+            },
+            groups: {
+                accountCenter: 'Tài khoản',
+                competencyProfile: 'Hồ sơ năng lực',
+                volunteerCampaigns: 'Quản lý chiến dịch',
+                campaignCoordination: 'Điều phối',
+                campaignReportMonitoring: 'Giám sát báo cáo',
+                feedbackTracking: 'Theo dõi phản hồi',
+                campaignParticipation: 'Tham gia',
+                aiRecommendation: 'AI gợi ý (/goi-y)',
+            },
+            columns: {
+                view: 'Xem',
+                manage: 'Quản lý',
+                join: 'Tham gia',
+                ai: 'AI',
+            },
+            actions: {
+                resetDefault: 'Về mặc định',
+                save: 'Lưu',
+            },
+            table: {
+                title: 'Ma trận phân quyền TNV',
+                summary: '{groups} nhóm chức năng · {permissions} quyền · Hiển thị {from}-{to} / {total} tài khoản',
+                rowsPerPage: 'Số dòng / trang',
+                currentAccount: 'Tài khoản hiện tại',
+                empty: 'Không tìm thấy tài khoản phù hợp để phân quyền user.',
+                pagination: 'Trang {page} / {totalPages} · Đang hiển thị {from}-{to} / {total} tài khoản',
+                ariaPagination: 'Phân trang phân quyền user',
+                columns: {
+                    account: 'Tài khoản',
+                    role: 'Vai trò',
+                    status: 'Trạng thái',
+                    mode: 'Chế độ',
+                    totalPermissions: 'Tổng quyền',
+                    actions: 'Thao tác',
+                },
+            },
+            toast: {
+                loadErrorTitle: 'Không thể tải phân quyền',
+                loadErrorMessage: 'Vui lòng thử lại sau.',
+                saveSuccessTitle: 'Đã lưu phân quyền',
+                saveSuccessMessage: 'Phân quyền user của "{name}" đã được cập nhật.',
+                resetSuccessTitle: 'Đã khôi phục mặc định',
+                resetSuccessMessage: 'Các quyền user của "{name}" đã về gói mặc định theo vai trò.',
+                saveErrorTitle: 'Không thể lưu phân quyền',
+                saveErrorMessage: 'Đã có lỗi xảy ra khi cập nhật phân quyền.',
+            },
+        },
+        campaignManagement: {
+            title: 'Quản lý chiến dịch',
+            subtitle: 'Duyệt chiến dịch mới, theo dõi và quản lý toàn bộ chiến dịch trong hệ thống',
+            exportReport: 'Xuất báo cáo',
+            exportReportAlert: 'Tính năng xuất báo cáo sẽ được kết nối API sau.',
+            stats: {
+                total: 'Tổng chiến dịch',
+                pending: 'Chờ duyệt',
+                approved: 'Đã duyệt',
+                pendingCancel: 'Yêu cầu hủy',
+                cancelled: 'Đã hủy',
+                active: 'Đang diễn ra',
+                completed: 'Hoàn thành'
+            },
+            tabs: {
+                pending: 'Chờ duyệt',
+                approved: 'Đã duyệt',
+                pending_cancel: 'Yêu cầu hủy',
+                cancelled: 'Đã hủy',
+                all: 'Tất cả',
+                active: 'Đang diễn ra',
+                completed: 'Hoàn thành'
+            },
+            filter: {
+                searchPlaceholder: 'Tìm theo tên chiến dịch, địa điểm, người tạo...',
+                allCategories: 'Tất cả loại',
+                allPriorities: 'Tất cả mức ưu tiên',
+                reset: 'Đặt lại'
+            },
+            categories: {
+                environment: 'Môi trường',
+                education: 'Giáo dục',
+                health: 'Y tế',
+                community: 'Cộng đồng',
+                disaster: 'Thiên tai'
+            },
+            priorities: {
+                urgent: 'Khẩn cấp',
+                high: 'Cao',
+                medium: 'Trung bình',
+                low: 'Thấp'
+            },
+            statuses: {
+                pending: 'Chờ duyệt',
+                pending_cancel: 'Yêu cầu hủy',
+                approved: 'Đã duyệt',
+                active: 'Đang diễn ra',
+                completed: 'Hoàn thành',
+                cancelled: 'Đã hủy',
+                rejected: 'Từ chối',
+                draft: 'Nháp'
+            },
+            table: {
+                campaign: 'Chiến dịch',
+                coordinator: 'Kiểm duyệt viên',
+                creator: 'Người tạo',
+                type: 'Loại',
+                priority: 'Ưu tiên',
+                volunteers: 'TNV',
+                status: 'Trạng thái',
+                time: 'Thời gian',
+                actions: 'Thao tác'
+            },
+            actions: {
+                view: 'Xem chi tiết',
+                approve: 'Duyệt',
+                reject: 'Từ chối',
+                suspend: 'Tạm dừng',
+                approveCancel: 'Duyệt hủy',
+                rejectCancel: 'Từ chối hủy',
+                start: 'Bắt đầu',
+                complete: 'Hoàn thành'
+            },
+            emptyState: 'Không tìm thấy chiến dịch nào phù hợp',
+            pagination: {
+                showing: 'Hiển thị {count} chiến dịch'
+            },
+            detailModal: {
+                location: 'Địa điểm',
+                time: 'Thời gian',
+                requiredVolunteers: 'Số TNV cần',
+                people: 'người',
+                registered: 'đã ĐK',
+                priority: 'Mức ưu tiên',
+                coordinatorLabel: 'Kiểm duyệt viên',
+                creatorLabel: 'Người tạo',
+                description: 'Mô tả chiến dịch',
+                cancelReasonTitle: 'Lý do yêu cầu hủy',
+                cancelRequestLabel: 'Người tạo đã gửi yêu cầu hủy chiến dịch với nội dung:',
+                skills: 'Kỹ năng yêu cầu',
+                map: 'Địa điểm chiến dịch',
+                lat: 'Vĩ độ',
+                lng: 'Kinh độ',
+                close: 'Đóng',
+                reject: 'Từ chối',
+                approve: 'Duyệt chiến dịch'
+            },
+            rejectModal: {
+                title: 'Từ chối chiến dịch',
+                cancelTitle: 'Từ chối yêu cầu hủy',
+                by: 'Bởi:',
+                reason: 'Lý do từ chối',
+                reasonPlaceholder: 'Nhập lý do từ chối chiến dịch này...',
+                cancel: 'Hủy',
+                confirm: 'Xác nhận từ chối'
+            },
+            confirm: {
+                approveTitle: 'Duyệt chiến dịch',
+                approveMessage: 'Bạn có chắc chắn muốn duyệt chiến dịch "{title}"?',
+                approveDetail: 'Chiến dịch sẽ chuyển sang Đang diễn ra và cho phép Tình nguyện viên đăng ký.',
+                approveBtn: 'Duyệt chiến dịch',
+                approveCancelTitle: 'Duyệt yêu cầu hủy',
+                approveCancelMessage: 'Bạn có chắc chắn muốn duyệt yêu cầu hủy của chiến dịch "{title}"?',
+                approveCancelDetail: 'Chiến dịch sẽ chuyển sang trạng thái đã hủy và người tạo sẽ nhận được thông báo.',
+                cancelReasonTitle: 'Thông tin yêu cầu hủy',
+                cancelReasonDetail: 'Lý do hủy: {reason}',
+                approveCancelBtn: 'Duyệt hủy',
+                startTitle: 'Bắt đầu chiến dịch',
+                startMessage: 'Xác nhận chuyển chiến dịch "{title}" sang Đang diễn ra?',
+                startDetail: 'Trạng thái chiến dịch sẽ được cập nhật để theo dõi tiến độ thực tế.',
+                startBtn: 'Bắt đầu',
+                completeTitle: 'Hoàn thành chiến dịch',
+                completeMessage: 'Xác nhận đánh dấu chiến dịch "{title}" là hoàn thành?',
+                completeDetail: 'Chiến dịch sẽ chuyển sang trạng thái hoàn thành và người tạo sẽ nhận thông báo.',
+                completeBtn: 'Hoàn thành',
+                suspendTitle: 'Tạm dừng chiến dịch',
+                suspendMessage: 'Bạn có thật sự muốn tạm dừng chiến dịch "{title}"?',
+                suspendDetail: 'Mọi hoạt động đăng ký sẽ bị khoá và người tạo sẽ nhận được thông báo.',
+                suspendBtn: 'Tạm dừng'
+            },
+            feedback: {
+                title: 'Phản hồi từ TNV',
+                empty: 'Chưa có phản hồi nào cho chiến dịch này'
+            },
+            reports: {
+                title: 'Báo cáo sự cố',
+                empty: 'Chưa có báo cáo nào liên quan chiến dịch',
+                processAction: 'Xử lý báo cáo',
+                processTitle: 'Xử lý báo cáo chiến dịch',
+                statusLabel: 'Trạng thái xử lý',
+                responseLabel: 'Phản hồi xử lý',
+                responsePlaceholder: 'Nhập phản hồi cho người gửi báo cáo...',
+                statuses: {
+                    moi: 'Mới',
+                    processing: 'Đang xử lý',
+                    done: 'Đã xử lý',
+                    rejected: 'Từ chối',
+                    dang_xu_ly: 'Đang xử lý',
+                    da_xu_ly: 'Đã xử lý',
+                    tu_choi: 'Từ chối'
+                }
+            },
+            volunteerModal: {
+                title: 'Danh sách TNV đăng ký',
+                empty: 'Chưa có TNV nào đăng ký chiến dịch này',
+                table: {
+                    volunteer: 'Tình nguyện viên',
+                    skills: 'Kỹ năng',
+                    area: 'Khu vực',
+                    status: 'Trạng thái',
+                    time: 'Thời gian'
+                }
+            },
+            history: {
+                title: 'Lịch sử kiểm duyệt',
+                empty: 'Chưa có lịch sử xử lý cho chiến dịch này',
+                actions: {
+                    tao_chien_dich_cho_duyet: 'Người tạo gửi chiến dịch chờ duyệt',
+                    duyet_chien_dich: 'Duyệt chiến dịch',
+                    tu_choi_chien_dich: 'Từ chối chiến dịch',
+                    gui_yeu_cau_huy: 'Gửi yêu cầu hủy chiến dịch',
+                    duyet_huy_chien_dich: 'Duyệt hủy chiến dịch',
+                    tu_choi_huy_chien_dich: 'Từ chối yêu cầu hủy',
+                    cap_nhat_trang_thai: 'Cập nhật trạng thái chiến dịch',
+                    xu_ly_bao_cao: 'Xử lý báo cáo sự cố'
+                }
+            },
+            toast: {
+                successTitle: 'Thành công',
+                errorTitle: 'Lỗi',
+                exportTitle: 'Thông báo',
+                rejectSuccessTitle: 'Đã từ chối',
+                approveSuccessMessage: 'Đã duyệt chiến dịch "{title}".',
+                approveCancelSuccessMessage: 'Đã duyệt yêu cầu hủy chiến dịch "{title}".',
+                startSuccessMessage: 'Đã cập nhật chiến dịch "{title}" sang Đang diễn ra.',
+                completeSuccessMessage: 'Đã cập nhật chiến dịch "{title}" sang Hoàn thành.',
+                suspendSuccessMessage: 'Đã tạm dừng chiến dịch "{title}".',
+                rejectSuccessMessage: 'Đã từ chối chiến dịch.'
+            }
+        },
+        ai: {
+            title: 'Hệ thống AI - Gợi ý tình nguyện viên',
+            subtitle: 'Sử dụng AI để gợi ý tình nguyện viên phù hợp cho từng chiến dịch',
+            banner: {
+                title: 'Thuật toán gợi ý thông minh',
+                desc: 'Hệ thống sử dụng <strong class="text-white">Content-Based Filtering</strong> kết hợp <strong class="text-white">Cosine Similarity</strong> để tính điểm phù hợp giữa kỹ năng, khu vực, kinh nghiệm của TNV và yêu cầu chiến dịch. Bán kính hoạt động được tính bằng <strong class="text-white">Haversine Formula</strong> trên Google Maps API.'
+            },
+            campaignSelection: {
+                title: 'Chọn chiến dịch cần gợi ý',
+                selectPlaceholder: '-- Chọn chiến dịch --',
+                radius: {
+                    10: 'Bán kính 10km',
+                    25: 'Bán kính 25km',
+                    50: 'Bán kính 50km',
+                    100: 'Bán kính 100km',
+                    0: 'Không giới hạn'
+                },
+                runAiBtn: 'Chạy AI gợi ý',
+                campaignInfo: {
+                    campaign: 'Chiến dịch',
+                    need: 'Cần tuyển',
+                    volunteers: 'TNV',
+                    skills: 'Kỹ năng yêu cầu',
+                    location: 'Khu vực'
+                }
+            },
+            results: {
+                title: 'Kết quả gợi ý AI',
+                matchCount: '{count} TNV phù hợp',
+                approveBtn: 'Phê duyệt',
+                sendNotifyBtn: 'Gửi thông báo',
+                table: {
+                    volunteer: 'Tình nguyện viên',
+                    matchScore: 'Điểm phù hợp',
+                    matchedSkills: 'Kỹ năng khớp',
+                    distance: 'Khoảng cách',
+                    experience: 'Kinh nghiệm',
+                    status: 'Trạng thái'
+                },
+                available: 'Sẵn sàng',
+                busy: 'Bận'
+            },
+            placeholder: {
+                title: 'Chọn chiến dịch và nhấn "Chạy AI gợi ý"',
+                desc: 'Hệ thống sẽ phân tích kỹ năng, khu vực, bán kính hoạt động<br>và đề xuất danh sách tình nguyện viên phù hợp nhất'
+            },
+            toast: {
+                successTitle: 'AI hoàn tất phân tích',
+                successMsg: 'Đã tìm thấy {count} TNV phù hợp'
+            }
+        },
+        articles: {
+            title: 'Quản lý bài viết',
+            subtitle: 'Đăng bài, chỉnh sửa, xóa và quản lý hiển thị bài viết',
+            newArticleBtn: 'Đăng bài mới',
+            searchPlaceholder: 'Tìm tiêu đề bài viết...',
+            allCategories: 'Tất cả danh mục',
+            allStatuses: 'Tất cả trạng thái',
+            reset: 'Đặt lại',
+            stats: {
+                total: 'Tổng bài viết',
+                published: 'Đã xuất bản',
+                draft: 'Bản nháp',
+                featured: 'Nổi bật'
+            },
+            status: {
+                published: 'Đã xuất bản',
+                draft: 'Nháp',
+                featured: 'Nổi bật'
+            },
+            table: {
+                article: 'Bài viết',
+                category: 'Danh mục',
+                status: 'Trạng thái',
+                views: 'Lượt xem',
+                interactions: 'Tương tác',
+                date: 'Ngày đăng',
+                actions: 'Thao tác'
+            },
+            actions: {
+                view: 'Xem',
+                edit: 'Sửa',
+                feature: 'Nổi bật',
+                delete: 'Xóa'
+            },
+            empty: {
+                noArticles: 'Không tìm thấy bài viết nào',
+                showing: 'Hiển thị {count} bài viết'
+            },
+            form: {
+                addTitle: 'Đăng bài viết mới',
+                editTitle: 'Chỉnh sửa bài viết',
+                titleLabel: 'Tiêu đề',
+                titlePlaceholder: 'Nhập tiêu đề bài viết...',
+                categoryLabel: 'Danh mục',
+                categorySelect: 'Chọn danh mục',
+                statusLabel: 'Trạng thái',
+                authorLabel: 'Tác giả',
+                authorPlaceholder: 'Tên tác giả...',
+                imageLabel: 'Ảnh bìa (URL)',
+                imagePlaceholder: 'https://...',
+                summaryLabel: 'Tóm tắt',
+                summaryPlaceholder: 'Tóm tắt nội dung bài viết...',
+                contentLabel: 'Nội dung bài viết',
+                contentPlaceholder: 'Viết nội dung bài viết tại đây...',
+                cancelBtn: 'Hủy',
+                saveDraftBtn: 'Lưu nháp',
+                updateBtn: 'Cập nhật',
+                publishBtn: 'Xuất bản'
+            },
+            view: {
+                title: 'Chi tiết bài viết',
+                closeBtn: 'Đóng',
+                editBtn: 'Chỉnh sửa'
+            },
+            delete: {
+                title: 'Xóa bài viết?',
+                message: 'Bài viết sẽ bị xóa vĩnh viễn và không thể khôi phục.',
+                confirmBtn: 'Xóa'
+            },
+            toast: {
+                updateSuccess: 'Cập nhật thành công',
+                updateMsg: 'Bài viết "{title}" đã được cập nhật',
+                draftSaved: 'Đã lưu bản nháp',
+                draftMsg: 'Bài viết "{title}" đã được lưu nháp',
+                publishSuccess: 'Đăng bài thành công',
+                publishMsg: 'Bài viết "{title}" đã được xuất bản',
+                unfeatured: 'Đã bỏ nổi bật',
+                featured: 'Đã đánh dấu nổi bật',
+                deleteSuccess: 'Đã xóa bài viết',
+                deleteMsg: '"{title}" đã bị xóa'
+            },
+            validation: {
+                titleRequired: 'Vui lòng nhập tiêu đề'
+            }
+        },
+        categories: {
+            title: 'Quản lý danh mục hệ thống',
+            subtitle: 'Kỹ năng, khu vực hoạt động và loại chiến dịch',
+            common: {
+                active: 'Đang hoạt động',
+                inactive: 'Tạm ẩn',
+                noIcon: 'Chưa cấu hình biểu tượng'
+            },
+            skills: {
+                title: 'Kỹ năng',
+                search: 'Tìm kiếm kỹ năng...',
+                usersCount: '{count} người dùng',
+                campaignsCount: '{count} chiến dịch',
+                notFound: 'Không tìm thấy kỹ năng',
+                total: 'Tổng: {count} kỹ năng',
+                label: 'kỹ năng'
+            },
+            regions: {
+                title: 'Khu vực',
+                search: 'Tìm kiếm khu vực...',
+                usersCount: '{count} tình nguyện viên',
+                campaignsCount: '{count} chiến dịch',
+                noCoordinates: 'Chưa có tọa độ',
+                notFound: 'Không tìm thấy khu vực',
+                total: 'Tổng: {count} khu vực',
+                label: 'khu vực'
+            },
+            types: {
+                title: 'Loại chiến dịch',
+                search: 'Tìm kiếm loại...',
+                campaignsCount: '{count} chiến dịch',
+                notFound: 'Không tìm thấy loại chiến dịch',
+                total: 'Tổng: {count} loại',
+                label: 'loại chiến dịch'
+            },
+            form: {
+                addTitle: 'Thêm {cat}',
+                editTitle: 'Chỉnh sửa {cat}',
+                nameLabel: 'Tên {cat}',
+                namePlaceholder: 'Nhập tên {cat}...',
+                iconLabel: 'Biểu tượng',
+                iconPlaceholder: 'Ví dụ: fa-solid fa-wrench',
+                descriptionLabel: 'Mô tả',
+                descriptionPlaceholder: 'Mô tả ngắn cho kỹ năng này...',
+                latitudeLabel: 'Vĩ độ',
+                latitudePlaceholder: 'Ví dụ: 16.0544',
+                longitudeLabel: 'Kinh độ',
+                longitudePlaceholder: 'Ví dụ: 108.2022',
+                colorLabel: 'Màu sắc',
+                colorPlaceholder: 'Ví dụ: #f59f00',
+                activeLabel: 'Hiển thị danh mục này trên hệ thống',
+                cancelBtn: 'Hủy',
+                updateBtn: 'Cập nhật',
+                addBtn: 'Thêm mới'
+            },
+            delete: {
+                title: 'Xóa {cat}?',
+                message: 'Bạn có chắc chắn muốn xóa {cat} này?',
+                confirmBtn: 'Xóa'
+            },
+            toast: {
+                updateSuccess: 'Cập nhật thành công',
+                updateMsg: 'Danh mục "{name}" đã được cập nhật',
+                addSuccess: 'Thêm thành công',
+                addMsg: 'Đã thêm {cat} "{name}"',
+                deleteSuccess: 'Đã xóa',
+                deleteMsg: 'Đã xóa {cat} "{name}"',
+                loadErrorTitle: 'Không thể tải danh mục',
+                loadErrorMessage: 'Vui lòng thử lại sau.',
+                saveErrorTitle: 'Không thể lưu danh mục',
+                saveErrorMessage: 'Đã có lỗi xảy ra khi cập nhật danh mục.',
+                deleteBlockedTitle: 'Không thể xóa danh mục',
+                deleteBlockedMessage: 'Danh mục này đang được sử dụng trong hệ thống.'
+            },
+            validation: {
+                nameRequired: 'Vui lòng nhập tên'
+            }
+        },
+        stats: {
+            title: 'Dashboard KDV',
+            subtitle: 'Tổng quan số liệu phục vụ kiểm duyệt chiến dịch',
+            period: {
+                week: '7 ngày qua',
+                month: '30 ngày qua',
+                quarter: '3 tháng',
+                year: 'Năm nay'
+            },
+            exportReport: 'Xuất báo cáo',
+            compare: 'so với kỳ trước',
+            kpi: {
+                totalUsers: 'Tổng người dùng',
+                totalCampaigns: 'Tổng chiến dịch',
+                completionRate: 'Tỷ lệ hoàn thành',
+                avgRating: 'Đánh giá TB'
+            },
+            charts: {
+                campaignMonth: 'Chiến dịch theo tháng',
+                campaignWeek: 'Chiến dịch theo ngày',
+                campaignQuarter: 'Chiến dịch theo tháng trong quý',
+                campaignYear: 'Chiến dịch theo tháng trong năm',
+                campaigns: 'Chiến dịch',
+                volunteers: 'TNV tham gia',
+                periodSummary: '{campaigns} chiến dịch, {volunteers} lượt TNV trong kỳ đã chọn',
+                campaignStatus: 'Trạng thái chiến dịch',
+                topRegions: 'Top khu vực hoạt động',
+                volunteersUnit: 'TNV',
+                topSkills: 'Kỹ năng phổ biến nhất',
+                peopleUnit: 'người'
+            },
+            status: {
+                recruiting: 'Đang tuyển',
+                active: 'Đang diễn ra',
+                completed: 'Hoàn thành',
+                cancelled: 'Đã hủy'
+            },
+            toast: {
+                exportSuccess: 'Xuất báo cáo thành công',
+                exportMsg: 'Báo cáo đã được tải xuống'
+            }
+        },
+        dashboard: {
+            title: 'Bảng điều khiển',
+            subtitle: 'Tổng quan hệ thống quản lý tình nguyện viên',
+            messages: {
+                loadFailed: 'Không thể tải dashboard'
+            },
+            period: {
+                week: '7 ngày qua',
+                month: '30 ngày qua',
+                quarter: '3 tháng',
+                year: 'Năm nay'
+            },
+            trend: {
+                increase: 'Tăng {value} so với kỳ trước',
+                decrease: 'Giảm {value} so với kỳ trước',
+                noChange: 'Không đổi so với kỳ trước'
+            },
+            stats: {
+                totalUsers: 'Tổng người dùng',
+                activeCampaigns: 'Chiến dịch hoạt động',
+                pendingApprovals: 'Tài khoản chờ duyệt',
+                publishedArticles: 'Bài viết đã đăng',
+                needsAction: 'Cần xử lý',
+                thisWeekCount: '+{count} tuần này'
+            },
+            charts: {
+                systemActivity: 'Hoạt động hệ thống',
+                newRegistrations: 'Đăng ký mới',
+                campaigns: 'Chiến dịch',
+                usersDistribution: 'Phân bố người dùng',
+                total: 'Tổng cộng',
+                roles: {
+                    volunteer: 'Tình nguyện viên',
+                    coordinator: 'Kiểm duyệt viên',
+                    admin: 'Quản trị viên',
+                    pending: 'Chờ duyệt'
+                }
+            },
+            activity: {
+                close: 'Đóng danh sách',
+                empty: 'Không có dữ liệu chi tiết trong mốc thời gian này.',
+                registrationsTitle: 'Danh sách đăng ký mới - {label}',
+                campaignsTitle: 'Danh sách chiến dịch - {label}',
+                table: {
+                    user: 'Người dùng',
+                    role: 'Vai trò',
+                    status: 'Trạng thái',
+                    time: 'Thời gian',
+                    detail: 'Chi tiết',
+                    campaign: 'Chiến dịch',
+                    creator: 'Người tạo'
+                }
+            },
+            approval: {
+                title: 'Tài khoản chờ duyệt',
+                viewAll: 'Xem tất cả',
+                approve: 'Duyệt',
+                toast: {
+                    approveSuccess: 'Đã duyệt tài khoản',
+                    approveMsg: '"{name}" đã được kích hoạt',
+                    rejectSuccess: 'Đã từ chối tài khoản',
+                    rejectMsg: '"{name}" đã bị từ chối'
+                }
+            },
+            recentUsers: {
+                title: 'Người dùng đăng ký gần đây',
+                empty: 'Chưa có người dùng đăng ký mới trong giai đoạn này.'
+            },
+            campaigns: {
+                title: 'Chiến dịch gần đây',
+                activeCount: '{count} đang hoạt động',
+                empty: 'Chưa có chiến dịch nào trong giai đoạn này.',
+                activeCountLabel: '{count} đang hoạt động'
+            },
+            modals: {
+                userTitle: 'Chi tiết người dùng',
+                campaignTitle: 'Chi tiết chiến dịch',
+                role: 'Vai trò',
+                status: 'Trạng thái',
+                phone: 'Số điện thoại',
+                notUpdated: 'Chưa cập nhật',
+                registeredAt: 'Thời gian đăng ký',
+                creator: 'Người tạo',
+                confirmedVolunteers: 'Tình nguyện viên xác nhận',
+                createdAt: 'Ngày tạo'
+            }
+        }
+    },
 
     articleCategories: {
         news: 'Tin tức',
@@ -939,6 +1861,10 @@ export default {
         recommendedDesc: 'Danh sách gợi ý minh bạch theo kỹ năng, lịch rảnh, khoảng cách, ưu tiên và độ tin cậy.',
         noRecommendedVolunteers: 'Chưa có tình nguyện viên đề xuất phù hợp.',
         showingRecommendedCount: 'Hiển thị {showing}/{total} tình nguyện viên đề xuất.',
+        remoteAreaTitle: 'Tình nguyện viên ở xa nhưng đúng khu vực hoạt động',
+        remoteAreaDesc: 'Nhóm này hiện ở xa hơn ngưỡng khoảng cách ưu tiên, nhưng đã khai báo sẵn sàng tham gia đúng khu vực của chiến dịch.',
+        remoteAreaBadge: 'Đúng khu vực hoạt động',
+        noRemoteArea: 'Chưa có tình nguyện viên ở xa nhưng đúng khu vực hoạt động.',
         profileHighlightTitle: 'Tình nguyện viên nổi bật về hồ sơ',
         profileHighlightDesc: 'Danh sách ưu tiên để xem nhanh những hồ sơ mạnh về kinh nghiệm và chứng chỉ.',
         noProfileHighlights: 'Chưa có tình nguyện viên nổi bật để hiển thị.',
@@ -1041,6 +1967,8 @@ export default {
         decisionBackupTitle: 'Giữ làm phương án dự phòng',
         decisionBackupWithWarnings: 'Ứng viên này vẫn có thể tham gia, nhưng còn vài điểm cần cân nhắc nên phù hợp để dự phòng.',
         decisionBackupSummary: 'Ứng viên đủ điều kiện, nhưng mức độ phù hợp tổng thể thấp hơn nhóm mời trước nên nên để dự phòng.',
+        decisionRemoteAreaTitle: 'Ở xa nhưng đúng khu vực',
+        decisionRemoteAreaSummary: 'Vị trí hiện tại còn xa địa điểm chiến dịch, nhưng khu vực hoạt động đã trùng với khu vực của chiến dịch nên có thể cân nhắc thêm.',
         matchPrimary: 'Đề xuất ưu tiên',
         matchBackup: 'Dự phòng phù hợp',
         matchConsider: 'Có thể cân nhắc',
@@ -1145,7 +2073,8 @@ export default {
         selectPriority: '-- Chọn mức --',
         locationAndTime: 'Địa điểm & Thời gian',
         locationLabel: 'Địa điểm',
-        locationPlaceholder: 'VD: Công viên Gia Định, TP.HCM',
+        locationPlaceholder: 'VD: Đà Nẵng hoặc Hải Châu, Đà Nẵng',
+        locationHint: 'Gõ khu vực như Đà Nẵng hoặc Hải Châu, Đà Nẵng để nhận gợi ý nhanh.',
         organizationLocation: 'Vị trí tổ chức',
         dragPinHint: '(kéo ghim để điều chỉnh)',
         latitude: 'Vĩ độ',
@@ -1161,6 +2090,10 @@ export default {
         submitBtn: 'Gửi duyệt',
         fillAllFields: 'Vui lòng điền đầy đủ thông tin!',
         locationFound: 'Đã tìm thấy:',
+        locationSuggestionLoading: 'Đang tải gợi ý địa điểm...',
+        locationSuggestionsEmpty: 'Chưa có gợi ý phù hợp. Bạn vẫn có thể nhập tay khu vực.',
+        locationSourceInternal: 'Hệ thống',
+        locationSourceMap: 'Bản đồ',
         locationNotFound: 'Không tìm thấy vị trí. Hãy kéo ghim trên bản đồ để xác định tọa độ.',
         connectionError: 'Lỗi kết nối. Hãy kéo ghim trên bản đồ.',
         savedFromDb: 'Đã tải toạ độ chiến dịch từ cơ sở dữ liệu.',
@@ -1484,5 +2417,162 @@ export default {
         teamwork: 'Làm việc nhóm',
         enthusiastic: 'Nhiệt tình',
         punctual: 'Đúng giờ',
+    },
+
+    // === TrustEval (AI Trust Evaluation) ===
+    trustEval: {
+        // Labels shared across components
+        labels: {
+            reliableHigh: 'Tin cậy cao',
+            reliable: 'Tin cậy',
+            neutral: 'Trung lập',
+            suspicious: 'Nghi ngờ',
+            suspiciousHigh: 'Nghi ngờ cao',
+        },
+
+        // SHAP Explanation
+        shap: {
+            title: 'Giải thích bằng SHAP',
+            subtitle: 'Các yếu tố ảnh hưởng đến điểm tin cậy',
+            baseValue: 'Giá trị cơ sở',
+            prediction: 'Dự đoán',
+            positiveFactors: 'Yếu tố tăng điểm',
+            negativeFactors: 'Yếu tố giảm điểm',
+            noFactors: 'Không có dữ liệu SHAP',
+        },
+
+        // Risk Flags
+        risk: {
+            criticalErrors: 'Lỗi nghiêm trọng',
+            warnings: 'Cảnh báo',
+            noFlags: 'Không có cờ rủi ro nào',
+            anomaly: 'Bất thường',
+            anomalyDetected: 'Phát hiện bất thường',
+            unusualPattern: 'Mẫu hành vi bất thường',
+            autoResolvable: 'Tự động khắc phục',
+        },
+
+        // Decision Support
+        decision: {
+            title: 'Hỗ trợ quyết định',
+            subtitle: 'Đề xuất hành động từ hệ thống AI',
+            confidence: 'Độ tin cậy',
+            reasonLabel: 'Lý do',
+            questionsToVerify: 'Câu hỏi cần xác minh',
+            sourceML: 'Đánh giá bằng ML',
+            sourceFallback: 'Đánh giá dự phòng',
+            actions: {
+                approve: 'Duyệt',
+                approveWithNote: 'Duyệt kèm ghi chú',
+                requestInfo: 'Yêu cầu bổ sung thông tin',
+                reject: 'Từ chối',
+            },
+        },
+
+        // Validation
+        validation: {
+            passed: 'Đạt kiểm tra',
+            failed: 'Không đạt kiểm tra',
+            criticalErrors: 'Lỗi nghiêm trọng',
+            warnings: 'Cảnh báo',
+        },
+
+        // Content Analysis
+        content: {
+            riskKeywords: 'Từ khóa rủi ro',
+            vagueness: 'Độ mơ hồ',
+            safetyDesc: 'Mức độ mô tả an toàn',
+            textRiskScore: 'Điểm rủi ro văn bản',
+            foundKeywords: 'Từ khóa phát hiện',
+        },
+
+        // Campaign Evaluation Panel
+        panel: {
+            title: 'Đánh giá tin cậy chiến dịch',
+            subtitle: 'Phân tích AI về độ tin cậy và mức rủi ro',
+            refresh: 'Đánh giá lại',
+            refreshSuccess: 'Đánh giá đã được cập nhật thành công.',
+            refreshError: 'Không thể làm mới đánh giá. Vui lòng thử lại.',
+            loading: 'Đang tải đánh giá...',
+            errorTitle: 'Lỗi tải đánh giá',
+            loadError: 'Không thể tải đánh giá. Vui lòng thử lại.',
+            trustScore: 'Điểm tin cậy',
+            riskScore: 'Điểm rủi ro',
+            confidence: 'Độ tin cậy',
+            volunteerTrust: 'Tin cậy TNV',
+            riskAssessment: 'Đánh giá rủi ro',
+            validationResult: 'Kết quả kiểm tra',
+            contentAnalysis: 'Phân tích nội dung',
+            notYetEvaluated: 'Chưa có đánh giá',
+            notYetEvaluatedDesc: 'Chiến dịch này chưa được đánh giá bởi hệ thống AI.',
+            runFirstEval: 'Chạy đánh giá đầu tiên',
+            sourceML: 'ML Service',
+            sourceFallback: 'Fallback',
+        },
+
+        // Volunteer Evaluation Panel
+        volunteer: {
+            title: 'Đánh giá tin cậy TNV',
+            subtitle: 'Phân tích AI về độ tin cậy của tình nguyện viên',
+            trustScoreLabel: 'Điểm tin cậy',
+            reliabilityTitle: 'Tóm tắt độ tin cậy',
+            totalRegistrations: 'Tổng đăng ký',
+            cancelledRegistrations: 'Đã hủy',
+            cancellationRate: 'Tỷ lệ hủy',
+            completionRate: 'Tỷ lệ hoàn thành',
+            ratings: 'đánh giá',
+            behaviorFlags: 'Cờ hành vi',
+            noEvaluation: 'Chưa có đánh giá',
+            noEvaluationDesc: 'Tình nguyện viên này chưa được đánh giá.',
+        },
+
+        // Dashboard
+        dashboard: {
+            title: 'Dashboard Đánh giá Tin cậy',
+            subtitle: 'Thống kê đánh giá AI của toàn hệ thống',
+            mlServiceOnline: 'ML Service Online',
+            mlServiceOffline: 'ML Service Offline',
+            modelsLoaded: 'models loaded',
+            loadError: 'Không thể tải thống kê.',
+
+            riskDistribution: 'Phân bố mức rủi ro',
+            trustDistribution: 'Phân bố nhãn tin cậy',
+            recommendedActions: 'Hành động được đề xuất',
+            evaluationSource: 'Nguồn đánh giá',
+            recentHighRisk: 'Chiến dịch rủi ro cao gần đây',
+            noHighRisk: 'Không có chiến dịch rủi ro cao nào.',
+            mlService: 'ML Service',
+            fallback: 'Fallback',
+            totalEvaluations: 'Tổng số đánh giá',
+            yes: 'Có',
+
+            riskLevels: {
+                low: 'Thấp',
+                medium: 'Trung bình',
+                high: 'Cao',
+                critical: 'Nghiêm trọng',
+            },
+
+            kpis: {
+                totalEvaluations: 'Tổng đánh giá',
+                avgTrustScore: 'Điểm TB tin cậy',
+                avgRiskScore: 'Điểm TB rủi ro',
+                highRiskCount: 'Rủi ro cao',
+                ofTotal: 'của tổng',
+                highTrust: 'Tin cậy cao',
+                mediumTrust: 'Tin cậy TB',
+                lowTrust: 'Tin cậy thấp',
+            },
+
+            table: {
+                campaign: 'Chiến dịch',
+                riskLevel: 'Mức rủi ro',
+                trustScore: 'Điểm tin cậy',
+                anomaly: 'Bất thường',
+                evaluatedAt: 'Thời gian đánh giá',
+            },
+
+            campaignId: 'Chiến dịch #{{id}}',
+        },
     },
 }

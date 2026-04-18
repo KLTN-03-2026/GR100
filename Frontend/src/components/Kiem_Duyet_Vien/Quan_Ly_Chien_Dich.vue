@@ -142,16 +142,16 @@
 										<button class="btn btn-sm btn-outline-primary" :title="$t('admin.campaignManagement.actions.view')" @click="openDetailModal(c)">
 											<i class="fa-solid fa-eye"></i>
 										</button>
-										<button v-if="c.rawStatus === 'cho_duyet'" class="btn btn-sm btn-outline-success" :title="$t('admin.campaignManagement.actions.approve')" @click="confirmApprove(c)">
+										<button v-if="canManageCampaignReview && c.rawStatus === 'cho_duyet'" class="btn btn-sm btn-outline-success" :title="$t('admin.campaignManagement.actions.approve')" @click="confirmApprove(c)">
 											<i class="fa-solid fa-check"></i>
 										</button>
-										<button v-if="c.rawStatus === 'cho_duyet'" class="btn btn-sm btn-outline-danger" :title="$t('admin.campaignManagement.actions.reject')" @click="openRejectModal(c, 'campaign')">
+										<button v-if="canManageCampaignReview && c.rawStatus === 'cho_duyet'" class="btn btn-sm btn-outline-danger" :title="$t('admin.campaignManagement.actions.reject')" @click="openRejectModal(c, 'campaign')">
 											<i class="fa-solid fa-xmark"></i>
 										</button>
-										<button v-if="c.rawStatus === 'yeu_cau_huy'" class="btn btn-sm btn-outline-danger" :title="$t('admin.campaignManagement.actions.approveCancel')" @click="confirmApproveCancel(c)">
+										<button v-if="canManageCampaignReview && c.rawStatus === 'yeu_cau_huy'" class="btn btn-sm btn-outline-danger" :title="$t('admin.campaignManagement.actions.approveCancel')" @click="confirmApproveCancel(c)">
 											<i class="fa-solid fa-ban"></i>
 										</button>
-										<button v-if="c.rawStatus === 'yeu_cau_huy'" class="btn btn-sm btn-outline-secondary" :title="$t('admin.campaignManagement.actions.rejectCancel')" @click="openRejectModal(c, 'cancel_request')">
+										<button v-if="canManageCampaignReview && c.rawStatus === 'yeu_cau_huy'" class="btn btn-sm btn-outline-secondary" :title="$t('admin.campaignManagement.actions.rejectCancel')" @click="openRejectModal(c, 'cancel_request')">
 											<i class="fa-solid fa-rotate-left"></i>
 										</button>
 									</div>
@@ -234,7 +234,20 @@
 
 						<div class="mb-4">
 							<h6 class="fw-bold small mb-2"><i class="fa-solid fa-file-lines text-primary me-2"></i>{{ $t('admin.campaignManagement.detailModal.description') }}</h6>
-							<p class="text-muted small mb-0 lh-lg">{{ detailTarget.description || '—' }}</p>
+							<div v-if="detailTargetDescriptionSections.length" class="row g-3">
+								<div v-for="section in detailTargetDescriptionSections" :key="section.key" class="col-md-6">
+									<div class="campaign-description-card h-100">
+										<div class="small fw-bold text-primary mb-2">{{ section.label }}</div>
+										<div class="text-muted small lh-lg mb-0">{{ section.value }}</div>
+									</div>
+								</div>
+							</div>
+							<ul v-else-if="detailTargetDescriptionItems.length > 1" class="text-muted small mb-0 ps-3 lh-lg campaign-description-list">
+								<li v-for="(item, index) in detailTargetDescriptionItems" :key="`review-campaign-description-${index}`" class="mb-2">
+									{{ item }}
+								</li>
+							</ul>
+							<p v-else class="text-muted small mb-0 lh-lg">{{ detailTargetDescriptionItems[0] || detailTarget.description || '—' }}</p>
 						</div>
 
 						<div v-if="detailTarget.cancelReason" class="alert alert-danger border-0 shadow-sm mb-4 cancel-reason-alert">
@@ -314,7 +327,7 @@
 										<div class="small mb-2" v-if="report.phan_hoi_xu_ly">
 											<strong>{{ $t('admin.campaignManagement.reports.responseLabel') }}:</strong> {{ report.phan_hoi_xu_ly }}
 										</div>
-										<button v-if="report.trang_thai !== 'da_xu_ly' && report.trang_thai !== 'tu_choi'" class="btn btn-sm btn-outline-primary rounded-pill" @click="openProcessReportModal(report)">
+										<button v-if="canManageCampaignReview && report.trang_thai !== 'da_xu_ly' && report.trang_thai !== 'tu_choi'" class="btn btn-sm btn-outline-primary rounded-pill" @click="openProcessReportModal(report)">
 											<i class="fa-solid fa-screwdriver-wrench me-1"></i>{{ $t('admin.campaignManagement.reports.processAction') }}
 										</button>
 									</div>
@@ -492,6 +505,8 @@
 <script>
 import ConfirmModal from '../../components/ConfirmModal.vue';
 import api from '../../services/api';
+import { extractCampaignDescriptionSections, parseCampaignDescription } from '../../utils/campaignDescription';
+import { hasPermission } from '../../utils/permissions';
 
 const PRIORITY_MAP = { khan_cap: 'urgent', cao: 'high', trung_binh: 'medium', thap: 'low' };
 const STATUS_MAP = {
@@ -531,6 +546,7 @@ export default {
 				cho_duyet: 0,
 				da_duyet: 0,
 				yeu_cau_huy: 0,
+				da_huy: 0,
 				dang_dien_ra: 0,
 				hoan_thanh: 0,
 			},
@@ -555,29 +571,43 @@ export default {
 			adminMarker: null,
 			adminMapLat: '',
 			adminMapLng: '',
+			currentUser: null,
 		};
 	},
 	computed: {
+		canManageCampaignReview() {
+			return hasPermission(this.currentUser, 'campaign_review.manage');
+		},
 		statsCards() {
 			return [
 				{ label: this.$t('admin.campaignManagement.stats.total'), value: this.stats.tong || 0, icon: 'fa-solid fa-flag', iconStyle: this.getStatIconStyle('#0d6efd') },
 				{ label: this.$t('admin.campaignManagement.stats.pending'), value: this.stats.cho_duyet || 0, icon: 'fa-solid fa-hourglass-half', iconStyle: this.getStatIconStyle('#f59f00') },
 				{ label: this.$t('admin.campaignManagement.stats.approved'), value: this.stats.da_duyet || 0, icon: 'fa-solid fa-check-circle', iconStyle: this.getStatIconStyle('#22b8cf') },
 				{ label: this.$t('admin.campaignManagement.stats.pendingCancel'), value: this.stats.yeu_cau_huy || 0, icon: 'fa-solid fa-times-circle', iconStyle: this.getStatIconStyle('#ff4d6d') },
+				{ label: this.$t('admin.campaignManagement.stats.cancelled'), value: this.stats.da_huy || 0, icon: 'fa-solid fa-ban', iconStyle: this.getStatIconStyle('#dc3545') },
 				{ label: this.$t('admin.campaignManagement.stats.active'), value: this.stats.dang_dien_ra || 0, icon: 'fa-solid fa-play', iconStyle: this.getStatIconStyle('#22c55e') },
 			];
 		},
 		filteredCampaigns() {
 			return this.campaigns;
 		},
+		detailTargetDescriptionSections() {
+			return extractCampaignDescriptionSections(this.detailTarget?.description || '');
+		},
+		detailTargetDescriptionItems() {
+			return parseCampaignDescription(this.detailTarget?.description || '');
+		},
 	},
 	async mounted() {
+		this.loadCurrentUser();
+		window.addEventListener('user-updated', this.loadCurrentUser);
 		this.ensureLeaflet();
 		this.syncFiltersFromRoute();
 		await Promise.all([this.loadFilterMeta(), this.loadCampaigns()]);
 		await this.openDetailFromRouteQuery();
 	},
 	beforeUnmount() {
+		window.removeEventListener('user-updated', this.loadCurrentUser);
 		if (this.searchDebounceTimer) {
 			clearTimeout(this.searchDebounceTimer);
 		}
@@ -587,6 +617,9 @@ export default {
 		}
 	},
 	watch: {
+		'$route'() {
+			this.loadCurrentUser();
+		},
 		'$route.query': {
 			deep: true,
 			async handler() {
@@ -619,6 +652,13 @@ export default {
 		},
 	},
 	methods: {
+		loadCurrentUser() {
+			try {
+				this.currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+			} catch (_error) {
+				this.currentUser = null;
+			}
+		},
 		async loadFilterMeta() {
 			try {
 				const res = await api.get('/kiem-duyet/chien-dich/bo-loc');
@@ -698,6 +738,7 @@ export default {
 						pending: 'cho_duyet',
 						approved: 'da_duyet',
 						pending_cancel: 'yeu_cau_huy',
+						cancelled: 'da_huy',
 						active: 'dang_dien_ra',
 						completed: 'hoan_thanh',
 					}[this.activeTab] || this.activeTab;
@@ -843,12 +884,14 @@ export default {
 			this.volunteerListLoading = false;
 		},
 		openRejectModal(campaign, mode) {
+			if (!this.canManageCampaignReview) return;
 			this.rejectTarget = campaign;
 			this.rejectMode = mode;
 			this.rejectReason = '';
 			this.showRejectModal = true;
 		},
 		async confirmReject() {
+			if (!this.canManageCampaignReview) return;
 			if (!this.rejectTarget || !this.rejectReason.trim()) return;
 			this.actionLoading = true;
 			try {
@@ -868,12 +911,14 @@ export default {
 			}
 		},
 		openProcessReportModal(report) {
+			if (!this.canManageCampaignReview) return;
 			this.reportTarget = report;
 			this.reportStatus = report.trang_thai === 'moi' ? 'dang_xu_ly' : report.trang_thai;
 			this.reportResponse = report.phan_hoi_xu_ly || '';
 			this.showReportModal = true;
 		},
 		async submitReportProcessing() {
+			if (!this.canManageCampaignReview) return;
 			if (!this.reportTarget) return;
 			this.actionLoading = true;
 			try {
@@ -896,6 +941,7 @@ export default {
 			}
 		},
 		confirmApprove(c) {
+			if (!this.canManageCampaignReview) return;
 			this.actionTarget = c;
 			this.pendingAction = 'approve';
 			this.confirmConfig = {
@@ -912,6 +958,7 @@ export default {
 			this.$refs.confirmModal.show();
 		},
 		confirmApproveCancel(c) {
+			if (!this.canManageCampaignReview) return;
 			this.actionTarget = c;
 			this.pendingAction = 'approve_cancel';
 			const detailList = [this.$t('admin.campaignManagement.confirm.approveCancelDetail')];
@@ -932,6 +979,7 @@ export default {
 			this.$refs.confirmModal.show();
 		},
 		async onConfirmAction() {
+			if (!this.canManageCampaignReview) return;
 			if (!this.actionTarget) return;
 			this.actionLoading = true;
 			try {
@@ -983,6 +1031,7 @@ export default {
 				pending: 'fa-solid fa-hourglass-half',
 				approved: 'fa-solid fa-circle-check',
 				pending_cancel: 'fa-solid fa-ban',
+				cancelled: 'fa-solid fa-trash-can',
 				all: 'fa-solid fa-list',
 				active: 'fa-solid fa-circle-play',
 				completed: 'fa-solid fa-circle-check',
@@ -993,6 +1042,7 @@ export default {
 				pending: 'bg-warning text-dark',
 				approved: 'bg-info text-white',
 				pending_cancel: 'bg-danger',
+				cancelled: 'bg-dark text-white',
 				all: 'bg-primary',
 				active: 'bg-success',
 				completed: 'bg-secondary',
@@ -1136,6 +1186,7 @@ export default {
 <style scoped>
 .stat-card { transition: transform 0.2s; }
 .stat-card:hover { transform: translateY(-2px); }
+.campaign-description-list li:last-child { margin-bottom: 0 !important; }
 .stat-icon {
 	width: 48px; height: 48px; border-radius: 12px;
 	display: flex; align-items: center; justify-content: center;
@@ -1176,6 +1227,13 @@ export default {
 	border: 1px solid #e9ecef;
 	border-radius: 16px;
 	padding: 1rem;
+}
+
+.campaign-description-card {
+	border: 1px solid rgba(13, 110, 253, 0.12);
+	border-radius: 1rem;
+	padding: 0.9rem 1rem;
+	background: linear-gradient(180deg, rgba(13, 110, 253, 0.04), rgba(13, 110, 253, 0.01));
 }
 .cancel-reason-alert {
 	background: linear-gradient(135deg, rgba(220, 53, 69, 0.1), rgba(220, 53, 69, 0.04));

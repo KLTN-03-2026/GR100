@@ -65,7 +65,7 @@ export default {
         settings: 'Settings',
         understood: 'Understood',
         completed: 'Completed',
-        views: 'views',
+        refresh: 'Refresh',
         featured: 'Featured',
         closed: 'Closed'
         ,
@@ -779,6 +779,927 @@ export default {
         }
     },
 
+    // === Admin: Layout ===
+    admin: {
+        layout: {
+            panel: 'Admin Panel',
+            overview: 'OVERVIEW',
+            dashboard: 'Dashboard',
+            management: 'MANAGEMENT',
+            users: 'Users',
+            campaigns: 'Campaigns',
+            categories: 'System Categories',
+            articles: 'Articles',
+            aiSystem: 'AI SYSTEM',
+            aiSuggest: 'AI Volunteers Suggestion',
+            reports: 'REPORTS',
+            statistics: 'Reviewer Dashboard',
+            aiEvaluation: 'AI Evaluation',
+            admin: 'Admin',
+            adminRole: 'Administrator',
+            reviewerRole: 'Reviewer',
+            searchPlaceholder: 'Search...',
+            homeView: 'View Home',
+            settings: 'Settings',
+            logout: 'Log Out',
+            permissionSection: 'PERMISSIONS',
+            permissions: 'Reviewer permissions',
+            userPermissions: 'Volunteer permissions',
+            notifications: {
+                title: 'Notifications',
+                markAllRead: 'Mark all as read',
+                pendingCampaign: 'Green Summer campaign is waiting for review',
+                pendingCampaignTime: '10 minutes ago',
+                newRegistrations: '5 new volunteer registrations',
+                newRegistrationsTime: '1 hour ago',
+                viewAll: 'View all notifications',
+            },
+        },
+        dashboard: {
+            title: 'Dashboard',
+            subtitle: 'Volunteer management system overview',
+            messages: {
+                loadFailed: 'Unable to load dashboard'
+            },
+            trend: {
+                increase: 'Up {value} compared to the previous period',
+                decrease: 'Down {value} compared to the previous period',
+                noChange: 'No change compared to the previous period'
+            },
+            dateRange: {
+                last7Days: 'Last 7 days',
+                last30Days: 'Last 30 days',
+                last3Months: 'Last 3 months',
+                thisYear: 'This year'
+            },
+            stats: {
+                totalUsers: 'Total Users',
+                activeCampaigns: 'Active Campaigns',
+                pendingUsers: 'Pending Accounts',
+                publishedArticles: 'Published Articles',
+                needsAction: 'Needs Action',
+                thisWeek: '+8 this week'
+            },
+            charts: {
+                systemActivity: 'System Activity',
+                newRegistrations: 'New Registrations',
+                campaigns: 'Campaigns',
+                registrationsLabel: 'registrations',
+                campaignsLabel: 'campaigns',
+                days: {
+                    mon: 'Mon', tue: 'Tue', wed: 'Wed', thu: 'Thu', fri: 'Fri', sat: 'Sat', sun: 'Sun'
+                },
+                userDistribution: 'User Distribution',
+                total: 'Total',
+                roles: {
+                    volunteer: 'Volunteer',
+                    coordinator: 'Coordinator',
+                    admin: 'Administrator',
+                    pending: 'Pending'
+                }
+            },
+            activity: {
+                close: 'Close list',
+                empty: 'No detailed data in this time bucket.',
+                registrationsTitle: 'New registrations - {label}',
+                campaignsTitle: 'Campaign list - {label}',
+                pagination: 'Page {page} / {totalPages} · Showing {from}-{to} / {total} items',
+                table: {
+                    user: 'User',
+                    role: 'Role',
+                    status: 'Status',
+                    time: 'Time',
+                    detail: 'Detail',
+                    campaign: 'Campaign',
+                    creator: 'Creator'
+                }
+            },
+            recentUsers: {
+                title: 'Recently registered users',
+                empty: 'No new users registered in this period.'
+            },
+            campaigns: {
+                title: 'Recent campaigns',
+                empty: 'No campaigns in this period.',
+                activeCountLabel: '{count} active'
+            },
+            modals: {
+                userTitle: 'User details',
+                campaignTitle: 'Campaign details',
+                role: 'Role',
+                status: 'Status',
+                phone: 'Phone number',
+                notUpdated: 'Not updated',
+                registeredAt: 'Registered at',
+                creator: 'Creator',
+                confirmedVolunteers: 'Confirmed volunteers',
+                createdAt: 'Created at'
+            },
+            pendingApprovals: {
+                title: 'Pending Accounts',
+                viewAll: 'View All',
+                approve: 'Approve',
+                approved: 'Account Approved',
+                approvedDesc: 'has been activated',
+                reject: 'Reject',
+                rejected: 'Account Rejected',
+                rejectedDesc: 'has been rejected',
+                timeAgo: {
+                    hours: 'hours ago',
+                    days: 'days ago'
+                }
+            },
+            recentCampaigns: {
+                title: 'Recent Campaigns',
+                activeCount: 'active',
+                status: {
+                    recruiting: 'Recruiting',
+                    full: 'Full',
+                    completed: 'Completed'
+                }
+            }
+        },
+        userManagement: {
+            title: 'User Management',
+            subtitle: 'Manage accounts, roles, account status and email verification',
+            addUser: 'Add User',
+            permissionButton: 'Permissions',
+            tabs: {
+                all: 'All',
+                pending: 'Pending',
+                locked: 'Locked'
+            },
+            filter: {
+                searchPlaceholder: 'Search by name, email...',
+                allRoles: 'All roles',
+                allStatuses: 'All statuses',
+                reset: 'Reset'
+            },
+            roles: {
+                volunteer: 'Volunteer',
+                coordinator: 'Coordinator',
+                admin: 'Admin'
+            },
+            statuses: {
+                active: 'Active',
+                pending: 'Pending',
+                locked: 'Locked'
+            },
+            table: {
+                user: 'User',
+                role: 'Role',
+                status: 'Status',
+                emailVerified: 'Email Verification',
+                createdAt: 'Created At',
+                campaigns: 'Campaigns',
+                actions: 'Actions',
+                noPhone: 'No phone number'
+            },
+            actions: {
+                view: 'View Details',
+                edit: 'Edit',
+                approve: 'Approve',
+                lock: 'Lock',
+                unlock: 'Unlock',
+                delete: 'Delete'
+            },
+            emptyState: 'No matching users found',
+            emailVerified: {
+                yes: 'Verified',
+                no: 'Not verified'
+            },
+            pagination: {
+                showing: 'Showing {from}-{to} / {total} users'
+            },
+            modal: {
+                addUser: 'Add New User',
+                editUser: 'Edit User',
+                fullName: 'Full Name',
+                fullNamePlaceholder: 'Enter full name...',
+                email: 'Email',
+                emailPlaceholder: 'Enter email...',
+                phone: 'Phone Number',
+                phonePlaceholder: 'Enter phone number...',
+                role: 'Role',
+                password: 'Password',
+                passwordOptional: 'New Password',
+                passwordPlaceholder: 'Enter password...',
+                status: 'Status',
+                emailVerified: 'Mark email as verified',
+                cancel: 'Cancel',
+                createAccount: 'Create Account',
+                update: 'Update',
+                close: 'Close'
+            },
+            validation: {
+                fullNameRequired: 'Please enter full name',
+                emailRequired: 'Please enter email',
+                emailInvalid: 'Invalid email',
+                passwordRequired: 'Please enter password'
+            },
+            toast: {
+                updateSuccessTitle: 'Update Successful',
+                updateSuccessMessage: 'User "{name}" has been updated',
+                createSuccessTitle: 'Account Created',
+                createSuccessMessage: 'User "{name}" has been added to the system',
+                approveSuccessTitle: 'Account Approved',
+                approveSuccessMessage: '"{name}" has been activated',
+                lockSuccessTitle: 'Account Locked',
+                lockSuccessMessage: '"{name}" has been locked',
+                unlockSuccessTitle: 'Account Unlocked',
+                unlockSuccessMessage: '"{name}" has been unlocked',
+                deleteSuccessTitle: 'User Deleted',
+                deleteSuccessMessage: '"{name}" has been deleted from the system',
+                loadErrorTitle: 'Unable to load users',
+                loadErrorMessage: 'Please try again later.',
+                saveErrorTitle: 'Unable to save changes',
+                saveErrorMessage: 'Something went wrong while updating user data.'
+            },
+            confirm: {
+                approveTitle: 'Approve account?',
+                approveMessage: 'Are you sure you want to approve this account?',
+                lockTitle: 'Lock account?',
+                lockMessage: 'User will not be able to log in after being locked.',
+                unlockTitle: 'Unlock account?',
+                unlockMessage: 'User will be able to log in again.',
+                deleteTitle: 'Delete user?',
+                deleteMessage: 'This action cannot be undone. All related data will be deleted.'
+            },
+            viewModal: {
+                title: 'User Details'
+            }
+        },
+        permissions: {
+            title: 'Reviewer permissions',
+            subtitle: 'This screen only configures reviewer accounts. Reviewers now only keep the Campaign screen and its related actions.',
+            badges: {
+                default: 'Reviewer role',
+                custom: 'Action override',
+            },
+            summary: {
+                totalAccounts: 'Total reviewer accounts',
+                reviewers: 'Reviewers',
+                defaultMode: 'Using default',
+                customMode: 'Using custom',
+            },
+            filter: {
+                searchPlaceholder: 'Search by name, email...',
+                allRoles: 'All roles',
+                allStatuses: 'All statuses',
+                allModes: 'All modes',
+                reset: 'Reset',
+            },
+            modes: {
+                default: 'Default by role',
+                custom: 'Manual override',
+            },
+            groups: {
+                dashboard: 'Dashboard',
+                campaignReview: 'Campaigns',
+            },
+            columns: {
+                access: 'Access',
+                view: 'View',
+                manage: 'Manage',
+            },
+            actions: {
+                resetDefault: 'Reset default',
+                save: 'Save',
+            },
+            table: {
+                title: 'Reviewer permission matrix',
+                summary: '{groups} feature groups · {permissions} permissions · Showing {from}-{to} / {total} accounts',
+                rowsPerPage: 'Rows / page',
+                currentAccount: 'Current account',
+                empty: 'No matching accounts were found for permission assignment.',
+                pagination: 'Page {page} / {totalPages} · Showing {from}-{to} / {total} accounts',
+                ariaPagination: 'Reviewer permission pagination',
+                columns: {
+                    account: 'Account',
+                    role: 'Role',
+                    status: 'Status',
+                    mode: 'Mode',
+                    totalPermissions: 'Total permissions',
+                    actions: 'Actions',
+                },
+            },
+            toast: {
+                loadErrorTitle: 'Unable to load permissions',
+                loadErrorMessage: 'Please try again later.',
+                saveSuccessTitle: 'Permissions saved',
+                saveSuccessMessage: 'Permissions for "{name}" have been updated.',
+                resetSuccessTitle: 'Defaults restored',
+                resetSuccessMessage: '"{name}" is now using the role default permission set again.',
+                saveErrorTitle: 'Unable to save permissions',
+                saveErrorMessage: 'An error occurred while updating permissions.',
+            },
+        },
+        userPermissions: {
+            title: 'Volunteer permissions',
+            subtitle: 'Configure volunteer-facing screens. Removing view will hide the menu entry and block access to the page.',
+            badges: {
+                scope: 'Volunteer role',
+                separateTable: 'Per-screen matrix',
+            },
+            summary: {
+                totalAccounts: 'Total volunteer accounts',
+                volunteers: 'Volunteers',
+                defaultMode: 'Using default',
+                customMode: 'Using custom',
+            },
+            filter: {
+                searchPlaceholder: 'Search by name, email...',
+                allRoles: 'All roles',
+                allStatuses: 'All statuses',
+                allModes: 'All modes',
+                reset: 'Reset',
+            },
+            modes: {
+                default: 'Default by role',
+                custom: 'Manual override',
+            },
+            groups: {
+                accountCenter: 'Account',
+                competencyProfile: 'Competency profile',
+                volunteerCampaigns: 'Campaign management',
+                campaignCoordination: 'Coordination',
+                campaignReportMonitoring: 'Report monitoring',
+                feedbackTracking: 'Feedback tracking',
+                campaignParticipation: 'Participation',
+                aiRecommendation: 'AI suggestion (/goi-y)',
+            },
+            columns: {
+                view: 'View',
+                manage: 'Manage',
+                join: 'Join',
+                ai: 'AI',
+            },
+            actions: {
+                resetDefault: 'Reset default',
+                save: 'Save',
+            },
+            table: {
+                title: 'Volunteer permission matrix',
+                summary: '{groups} feature groups · {permissions} permissions · Showing {from}-{to} / {total} accounts',
+                rowsPerPage: 'Rows / page',
+                currentAccount: 'Current account',
+                empty: 'No matching accounts were found for user permission assignment.',
+                pagination: 'Page {page} / {totalPages} · Showing {from}-{to} / {total} accounts',
+                ariaPagination: 'User permission pagination',
+                columns: {
+                    account: 'Account',
+                    role: 'Role',
+                    status: 'Status',
+                    mode: 'Mode',
+                    totalPermissions: 'Total permissions',
+                    actions: 'Actions',
+                },
+            },
+            toast: {
+                loadErrorTitle: 'Unable to load permissions',
+                loadErrorMessage: 'Please try again later.',
+                saveSuccessTitle: 'Permissions saved',
+                saveSuccessMessage: 'User permissions for "{name}" have been updated.',
+                resetSuccessTitle: 'Defaults restored',
+                resetSuccessMessage: 'User permissions for "{name}" have been restored to the role defaults.',
+                saveErrorTitle: 'Unable to save permissions',
+                saveErrorMessage: 'An error occurred while updating permissions.',
+            },
+        },
+        campaignManagement: {
+            title: 'Campaign Management',
+            subtitle: 'Approve new campaigns, monitor and manage all campaigns in the system',
+            exportReport: 'Export Report',
+            exportReportAlert: 'The export report feature will be connected to the API later.',
+            stats: {
+                total: 'Total Campaigns',
+                pending: 'Pending',
+                approved: 'Approved',
+                pendingCancel: 'Cancel Requests',
+                cancelled: 'Cancelled',
+                active: 'Active',
+                completed: 'Completed'
+            },
+            tabs: {
+                pending: 'Pending',
+                approved: 'Approved',
+                pending_cancel: 'Cancel Requests',
+                cancelled: 'Cancelled',
+                all: 'All',
+                active: 'Active',
+                completed: 'Completed'
+            },
+            filter: {
+                searchPlaceholder: 'Search by campaign name, location, creator...',
+                allCategories: 'All Categories',
+                allPriorities: 'All Priorities',
+                reset: 'Reset'
+            },
+            categories: {
+                environment: 'Environment',
+                education: 'Education',
+                health: 'Health',
+                community: 'Community',
+                disaster: 'Disaster Relief'
+            },
+            priorities: {
+                urgent: 'Urgent',
+                high: 'High',
+                medium: 'Medium',
+                low: 'Low'
+            },
+            statuses: {
+                pending: 'Pending',
+                pending_cancel: 'Cancel Request',
+                approved: 'Approved',
+                active: 'Active',
+                completed: 'Completed',
+                cancelled: 'Cancelled',
+                rejected: 'Rejected',
+                draft: 'Draft'
+            },
+            table: {
+                campaign: 'Campaign',
+                coordinator: 'Coordinator',
+                creator: 'Creator',
+                type: 'Type',
+                priority: 'Priority',
+                volunteers: 'Vols',
+                status: 'Status',
+                time: 'Time',
+                actions: 'Actions'
+            },
+            actions: {
+                view: 'View Details',
+                approve: 'Approve',
+                reject: 'Reject',
+                suspend: 'Suspend',
+                approveCancel: 'Approve Cancel',
+                rejectCancel: 'Reject Cancel',
+                start: 'Start',
+                complete: 'Complete'
+            },
+            emptyState: 'No matching campaigns found',
+            pagination: {
+                showing: 'Showing {count} campaigns'
+            },
+            detailModal: {
+                location: 'Location',
+                time: 'Time',
+                requiredVolunteers: 'Volunteers Needed',
+                people: 'people',
+                registered: 'registered',
+                priority: 'Priority',
+                coordinatorLabel: 'Coordinator',
+                creatorLabel: 'Creator',
+                description: 'Campaign Description',
+                cancelReasonTitle: 'Cancel request reason',
+                cancelRequestLabel: 'The campaign creator submitted this cancel request:',
+                skills: 'Required Skills',
+                map: 'Campaign Location',
+                lat: 'Latitude',
+                lng: 'Longitude',
+                close: 'Close',
+                reject: 'Reject',
+                approve: 'Approve Campaign'
+            },
+            rejectModal: {
+                title: 'Reject Campaign',
+                cancelTitle: 'Reject Cancel Request',
+                by: 'By:',
+                reason: 'Rejection Reason',
+                reasonPlaceholder: 'Enter the reason for rejecting this campaign...',
+                cancel: 'Cancel',
+                confirm: 'Confirm Rejection'
+            },
+            confirm: {
+                approveTitle: 'Approve Campaign',
+                approveMessage: 'Are you sure you want to approve the campaign "{title}"?',
+                approveDetail: 'The campaign will become Active and allow volunteers to register.',
+                approveBtn: 'Approve Campaign',
+                approveCancelTitle: 'Approve Cancel Request',
+                approveCancelMessage: 'Are you sure you want to approve the cancel request for "{title}"?',
+                approveCancelDetail: 'The campaign will be cancelled and the creator will be notified.',
+                cancelReasonTitle: 'Cancel request details',
+                cancelReasonDetail: 'Cancel reason: {reason}',
+                approveCancelBtn: 'Approve Cancel',
+                startTitle: 'Start Campaign',
+                startMessage: 'Confirm changing campaign "{title}" to Active?',
+                startDetail: 'The campaign status will be updated to reflect actual execution progress.',
+                startBtn: 'Start Campaign',
+                completeTitle: 'Complete Campaign',
+                completeMessage: 'Confirm marking campaign "{title}" as completed?',
+                completeDetail: 'The campaign will move to completed status and notify the creator.',
+                completeBtn: 'Complete Campaign',
+                suspendTitle: 'Suspend Campaign',
+                suspendMessage: 'Are you sure you want to suspend the campaign "{title}"?',
+                suspendDetail: 'All registrations will be locked and the creator will be notified.',
+                suspendBtn: 'Suspend'
+            },
+            feedback: {
+                title: 'Volunteer Feedback',
+                empty: 'No feedback has been submitted for this campaign yet'
+            },
+            reports: {
+                title: 'Incident Reports',
+                empty: 'No reports related to this campaign',
+                processAction: 'Process Report',
+                processTitle: 'Process Campaign Report',
+                statusLabel: 'Processing Status',
+                responseLabel: 'Response',
+                responsePlaceholder: 'Enter a response for the reporter...',
+                statuses: {
+                    moi: 'New',
+                    processing: 'Processing',
+                    done: 'Resolved',
+                    rejected: 'Rejected',
+                    dang_xu_ly: 'Processing',
+                    da_xu_ly: 'Resolved',
+                    tu_choi: 'Rejected'
+                }
+            },
+            volunteerModal: {
+                title: 'Registered volunteers',
+                empty: 'No volunteers have registered for this campaign yet',
+                table: {
+                    volunteer: 'Volunteer',
+                    skills: 'Skills',
+                    area: 'Area',
+                    status: 'Status',
+                    time: 'Time'
+                }
+            },
+            history: {
+                title: 'Review History',
+                empty: 'No review history for this campaign yet',
+                actions: {
+                    tao_chien_dich_cho_duyet: 'Campaign submitted for review',
+                    duyet_chien_dich: 'Campaign approved',
+                    tu_choi_chien_dich: 'Campaign rejected',
+                    gui_yeu_cau_huy: 'Cancel request submitted',
+                    duyet_huy_chien_dich: 'Cancel request approved',
+                    tu_choi_huy_chien_dich: 'Cancel request rejected',
+                    cap_nhat_trang_thai: 'Campaign status updated',
+                    xu_ly_bao_cao: 'Incident report processed'
+                }
+            },
+            toast: {
+                successTitle: 'Success',
+                errorTitle: 'Error',
+                exportTitle: 'Notice',
+                rejectSuccessTitle: 'Rejected',
+                approveSuccessMessage: 'Approved campaign "{title}".',
+                approveCancelSuccessMessage: 'Approved cancel request for "{title}".',
+                startSuccessMessage: 'Campaign "{title}" has been moved to Active.',
+                completeSuccessMessage: 'Campaign "{title}" has been marked as completed.',
+                suspendSuccessMessage: 'Suspended campaign "{title}".',
+                rejectSuccessMessage: 'Campaign has been rejected.'
+            }
+        },
+        ai: {
+            title: 'AI System - Volunteer Suggestion',
+            subtitle: 'Use AI to suggest suitable volunteers for each campaign',
+            banner: {
+                title: 'Smart Suggestion Algorithm',
+                desc: 'The system uses <strong class="text-white">Content-Based Filtering</strong> combined with <strong class="text-white">Cosine Similarity</strong> to calculate a match score based on volunteers\' skills, location, experience, and campaign requirements. The active radius is computed using the <strong class="text-white">Haversine Formula</strong> on Google Maps API.'
+            },
+            campaignSelection: {
+                title: 'Select campaign for suggestion',
+                selectPlaceholder: '-- Select campaign --',
+                radius: {
+                    10: '10km Radius',
+                    25: '25km Radius',
+                    50: '50km Radius',
+                    100: '100km Radius',
+                    0: 'No limit'
+                },
+                runAiBtn: 'Run AI Suggestion',
+                campaignInfo: {
+                    campaign: 'Campaign',
+                    need: 'Needed',
+                    volunteers: 'Vols',
+                    skills: 'Required Skills',
+                    location: 'Location'
+                }
+            },
+            results: {
+                title: 'AI Suggestion Results',
+                matchCount: '{count} matched vols',
+                approveBtn: 'Approve',
+                sendNotifyBtn: 'Send Notification',
+                table: {
+                    volunteer: 'Volunteer',
+                    matchScore: 'Match Score',
+                    matchedSkills: 'Matched Skills',
+                    distance: 'Distance',
+                    experience: 'Experience',
+                    status: 'Status'
+                },
+                available: 'Available',
+                busy: 'Busy'
+            },
+            placeholder: {
+                title: 'Select a campaign and click "Run AI Suggestion"',
+                desc: 'The system will analyze skills, areas, and radius<br>to suggest the most suitable volunteer list.'
+            },
+            toast: {
+                successTitle: 'AI analysis complete',
+                successMsg: 'Found {count} matching volunteers'
+            }
+        },
+        articles: {
+            title: 'Article Management',
+            subtitle: 'Publish, edit, delete and manage article visibility',
+            newArticleBtn: 'New Article',
+            searchPlaceholder: 'Search article title...',
+            allCategories: 'All categories',
+            allStatuses: 'All statuses',
+            reset: 'Reset',
+            stats: {
+                total: 'Total Articles',
+                published: 'Published',
+                draft: 'Drafts',
+                featured: 'Featured'
+            },
+            status: {
+                published: 'Published',
+                draft: 'Draft',
+                featured: 'Featured'
+            },
+            table: {
+                article: 'Article',
+                category: 'Category',
+                status: 'Status',
+                views: 'Views',
+                interactions: 'Interactions',
+                date: 'Published Date',
+                actions: 'Actions'
+            },
+            actions: {
+                view: 'View',
+                edit: 'Edit',
+                feature: 'Feature',
+                delete: 'Delete'
+            },
+            empty: {
+                noArticles: 'No articles found',
+                showing: 'Showing {count} articles'
+            },
+            form: {
+                addTitle: 'New Article',
+                editTitle: 'Edit Article',
+                titleLabel: 'Title',
+                titlePlaceholder: 'Enter article title...',
+                categoryLabel: 'Category',
+                categorySelect: 'Select category',
+                statusLabel: 'Status',
+                authorLabel: 'Author',
+                authorPlaceholder: 'Author name...',
+                imageLabel: 'Cover Image (URL)',
+                imagePlaceholder: 'https://...',
+                summaryLabel: 'Summary',
+                summaryPlaceholder: 'Article summary...',
+                contentLabel: 'Article Content',
+                contentPlaceholder: 'Write article content here...',
+                cancelBtn: 'Cancel',
+                saveDraftBtn: 'Save Draft',
+                updateBtn: 'Update',
+                publishBtn: 'Publish'
+            },
+            view: {
+                title: 'Article Details',
+                closeBtn: 'Close',
+                editBtn: 'Edit'
+            },
+            delete: {
+                title: 'Delete article?',
+                message: 'This article will be permanently deleted and cannot be recovered.',
+                confirmBtn: 'Delete'
+            },
+            toast: {
+                updateSuccess: 'Update successful',
+                updateMsg: 'Article "{title}" has been updated',
+                draftSaved: 'Draft saved',
+                draftMsg: 'Article "{title}" has been saved as draft',
+                publishSuccess: 'Publish successful',
+                publishMsg: 'Article "{title}" has been published',
+                unfeatured: 'Removed from featured',
+                featured: 'Marked as featured',
+                deleteSuccess: 'Article deleted',
+                deleteMsg: '"{title}" has been deleted'
+            },
+            validation: {
+                titleRequired: 'Please enter a title'
+            }
+        },
+        categories: {
+            title: 'System Categories Management',
+            subtitle: 'Skills, operation regions and campaign types',
+            common: {
+                active: 'Active',
+                inactive: 'Hidden',
+                noIcon: 'No icon configured'
+            },
+            skills: {
+                title: 'Skills',
+                search: 'Search skills...',
+                usersCount: '{count} users',
+                campaignsCount: '{count} campaigns',
+                notFound: 'No skills found',
+                total: 'Total: {count} skills',
+                label: 'skill'
+            },
+            regions: {
+                title: 'Regions',
+                search: 'Search regions...',
+                usersCount: '{count} volunteers',
+                campaignsCount: '{count} campaigns',
+                noCoordinates: 'No coordinates available',
+                notFound: 'No regions found',
+                total: 'Total: {count} regions',
+                label: 'region'
+            },
+            types: {
+                title: 'Campaign Types',
+                search: 'Search types...',
+                campaignsCount: '{count} campaigns',
+                notFound: 'No campaign types found',
+                total: 'Total: {count} types',
+                label: 'campaign type'
+            },
+            form: {
+                addTitle: 'Add {cat}',
+                editTitle: 'Edit {cat}',
+                nameLabel: '{cat} Name',
+                namePlaceholder: 'Enter {cat} name...',
+                iconLabel: 'Icon',
+                iconPlaceholder: 'Example: fa-solid fa-wrench',
+                descriptionLabel: 'Description',
+                descriptionPlaceholder: 'Short description for this skill...',
+                latitudeLabel: 'Latitude',
+                latitudePlaceholder: 'Example: 16.0544',
+                longitudeLabel: 'Longitude',
+                longitudePlaceholder: 'Example: 108.2022',
+                colorLabel: 'Color',
+                colorPlaceholder: 'Example: #f59f00',
+                activeLabel: 'Show this category across the system',
+                cancelBtn: 'Cancel',
+                updateBtn: 'Update',
+                addBtn: 'Add New'
+            },
+            delete: {
+                title: 'Delete {cat}?',
+                message: 'Are you sure you want to delete this {cat}?',
+                confirmBtn: 'Delete'
+            },
+            toast: {
+                updateSuccess: 'Update successful',
+                updateMsg: 'Category "{name}" has been updated',
+                addSuccess: 'Add successful',
+                addMsg: 'Added {cat} "{name}"',
+                deleteSuccess: 'Deleted',
+                deleteMsg: 'Deleted {cat} "{name}"',
+                loadErrorTitle: 'Unable to load categories',
+                loadErrorMessage: 'Please try again later.',
+                saveErrorTitle: 'Unable to save category',
+                saveErrorMessage: 'Something went wrong while updating this category.',
+                deleteBlockedTitle: 'Unable to delete category',
+                deleteBlockedMessage: 'This category is already being used in the system.'
+            },
+            validation: {
+                nameRequired: 'Please enter a name'
+            }
+        },
+        stats: {
+            title: 'Reviewer Dashboard',
+            subtitle: 'Operational metrics for campaign review and supervision',
+            period: {
+                week: 'Last 7 days',
+                month: 'Last 30 days',
+                quarter: '3 months',
+                year: 'This year'
+            },
+            exportReport: 'Export Report',
+            compare: 'vs previous period',
+            kpi: {
+                totalUsers: 'Total Users',
+                totalCampaigns: 'Total Campaigns',
+                completionRate: 'Completion Rate',
+                avgRating: 'Avg Rating'
+            },
+            charts: {
+                campaignMonth: 'Campaigns by Month',
+                campaignWeek: 'Campaigns by Day',
+                campaignQuarter: 'Campaigns by Month in Quarter',
+                campaignYear: 'Campaigns by Month in Year',
+                campaigns: 'Campaigns',
+                volunteers: 'Volunteers Attended',
+                periodSummary: '{campaigns} campaigns, {volunteers} volunteer participations in the selected period',
+                campaignStatus: 'Campaign Statuses',
+                topRegions: 'Top Active Regions',
+                volunteersUnit: 'Vols',
+                topSkills: 'Most Popular Skills',
+                peopleUnit: 'people'
+            },
+            status: {
+                recruiting: 'Recruiting',
+                active: 'Active',
+                completed: 'Completed',
+                cancelled: 'Cancelled'
+            },
+            toast: {
+                exportSuccess: 'Export successful',
+                exportMsg: 'Report has been downloaded'
+            }
+        },
+        dashboard: {
+            title: 'Dashboard',
+            subtitle: 'Volunteer management system overview',
+            messages: {
+                loadFailed: 'Unable to load dashboard'
+            },
+            period: {
+                week: 'Last 7 days',
+                month: 'Last 30 days',
+                quarter: '3 months',
+                year: 'This year'
+            },
+            trend: {
+                increase: 'Up {value} compared to the previous period',
+                decrease: 'Down {value} compared to the previous period',
+                noChange: 'No change compared to the previous period'
+            },
+            stats: {
+                totalUsers: 'Total Users',
+                activeCampaigns: 'Active Campaigns',
+                pendingApprovals: 'Pending Approvals',
+                publishedArticles: 'Published Articles',
+                needsAction: 'Needs Action',
+                thisWeekCount: '+{count} this week'
+            },
+            charts: {
+                systemActivity: 'System Activity',
+                newRegistrations: 'New Registrations',
+                campaigns: 'Campaigns',
+                usersDistribution: 'User Distribution',
+                total: 'Total',
+                roles: {
+                    volunteer: 'Volunteer',
+                    coordinator: 'Coordinator',
+                    admin: 'Admin',
+                    pending: 'Pending'
+                }
+            },
+            activity: {
+                close: 'Close list',
+                empty: 'No detailed data in this time bucket.',
+                registrationsTitle: 'New registrations - {label}',
+                campaignsTitle: 'Campaign list - {label}',
+                table: {
+                    user: 'User',
+                    role: 'Role',
+                    status: 'Status',
+                    time: 'Time',
+                    detail: 'Detail',
+                    campaign: 'Campaign',
+                    creator: 'Creator'
+                }
+            },
+            approval: {
+                title: 'Pending Approvals',
+                viewAll: 'View All',
+                approve: 'Approve',
+                toast: {
+                    approveSuccess: 'Account Approved',
+                    approveMsg: '"{name}" has been activated',
+                    rejectSuccess: 'Account Rejected',
+                    rejectMsg: '"{name}" has been rejected'
+                }
+            },
+            recentUsers: {
+                title: 'Recently registered users',
+                empty: 'No new users registered in this period.'
+            },
+            campaigns: {
+                title: 'Recent Campaigns',
+                activeCount: '{count} active',
+                empty: 'No campaigns in this period.',
+                activeCountLabel: '{count} active'
+            },
+            modals: {
+                userTitle: 'User details',
+                campaignTitle: 'Campaign details',
+                role: 'Role',
+                status: 'Status',
+                phone: 'Phone number',
+                notUpdated: 'Not updated',
+                registeredAt: 'Registered at',
+                creator: 'Creator',
+                confirmedVolunteers: 'Confirmed volunteers',
+                createdAt: 'Created at'
+            }
+        }
+    },
 
     articleCategories: {
         news: 'News',
@@ -940,6 +1861,10 @@ export default {
         recommendedDesc: 'Transparent suggestions based on skills, availability, distance, priority, and reliability.',
         noRecommendedVolunteers: 'No suitable volunteer suggestions yet.',
         showingRecommendedCount: 'Showing {showing}/{total} suggested volunteers.',
+        remoteAreaTitle: 'Far away but active in this area',
+        remoteAreaDesc: 'This group is currently beyond the preferred distance threshold, but they have declared that they are willing to participate in the campaign area.',
+        remoteAreaBadge: 'Active in this area',
+        noRemoteArea: 'No far-away volunteers matching the campaign area yet.',
         profileHighlightTitle: 'Profile highlight volunteers',
         profileHighlightDesc: 'A quick list of stronger profiles based on experience and certificates.',
         noProfileHighlights: 'No highlighted volunteers to display yet.',
@@ -1042,6 +1967,8 @@ export default {
         decisionBackupTitle: 'Keep as backup',
         decisionBackupWithWarnings: 'This candidate can still participate, but there are a few points to consider, so they fit better as backup.',
         decisionBackupSummary: 'This candidate is qualified, but their overall fit is lower than the primary group, so backup is more appropriate.',
+        decisionRemoteAreaTitle: 'Far away but area-aligned',
+        decisionRemoteAreaSummary: 'The current location is still far from the campaign, but the volunteer has declared the same operating area, so they are worth considering.',
         matchPrimary: 'Priority suggestion',
         matchBackup: 'Suitable backup',
         matchConsider: 'Worth considering',
@@ -1146,7 +2073,8 @@ export default {
         selectPriority: '-- Select Level --',
         locationAndTime: 'Location & Time',
         locationLabel: 'Location',
-        locationPlaceholder: 'Ex: Gia Dinh Park, HCMC',
+        locationPlaceholder: 'Ex: Da Nang or Hai Chau, Da Nang',
+        locationHint: 'Type an area like Da Nang or Hai Chau, Da Nang to get quick suggestions.',
         organizationLocation: 'Organization Location',
         dragPinHint: '(drag pin to adjust)',
         latitude: 'Latitude',
@@ -1162,6 +2090,10 @@ export default {
         submitBtn: 'Submit',
         fillAllFields: 'Please fill in all information!',
         locationFound: 'Location found:',
+        locationSuggestionLoading: 'Loading location suggestions...',
+        locationSuggestionsEmpty: 'No suitable suggestions yet. You can still type the area manually.',
+        locationSourceInternal: 'System',
+        locationSourceMap: 'Map',
         locationNotFound: 'Location not found. Please drag the pin on the map.',
         connectionError: 'Connection error. Please drag the pin on the map.',
         savedFromDb: 'Loaded campaign coordinates from the database.',
@@ -1485,5 +2417,153 @@ export default {
         teamwork: 'Teamwork',
         enthusiastic: 'Enthusiastic',
         punctual: 'Punctual',
+    },
+
+    // === TrustEval (AI Trust Evaluation) ===
+    trustEval: {
+        labels: {
+            reliableHigh: 'High Reliability',
+            reliable: 'Reliable',
+            neutral: 'Neutral',
+            suspicious: 'Suspicious',
+            suspiciousHigh: 'High Suspicion',
+        },
+
+        shap: {
+            title: 'SHAP Explanation',
+            subtitle: 'Factors influencing the trust score',
+            baseValue: 'Base Value',
+            prediction: 'Prediction',
+            positiveFactors: 'Positive Factors',
+            negativeFactors: 'Negative Factors',
+            noFactors: 'No SHAP data available',
+        },
+
+        risk: {
+            criticalErrors: 'Critical Errors',
+            warnings: 'Warnings',
+            noFlags: 'No risk flags',
+            anomaly: 'Anomaly',
+            anomalyDetected: 'Anomaly Detected',
+            unusualPattern: 'Unusual behavior pattern',
+            autoResolvable: 'Auto-resolvable',
+        },
+
+        decision: {
+            title: 'Decision Support',
+            subtitle: 'AI-suggested action',
+            confidence: 'Confidence',
+            reasonLabel: 'Reason',
+            questionsToVerify: 'Questions to verify',
+            sourceML: 'ML Evaluation',
+            sourceFallback: 'Fallback Evaluation',
+            actions: {
+                approve: 'Approve',
+                approveWithNote: 'Approve with Note',
+                requestInfo: 'Request Info',
+                reject: 'Reject',
+            },
+        },
+
+        validation: {
+            passed: 'Validation Passed',
+            failed: 'Validation Failed',
+            criticalErrors: 'Critical Errors',
+            warnings: 'Warnings',
+        },
+
+        content: {
+            riskKeywords: 'Risk Keywords',
+            vagueness: 'Vagueness',
+            safetyDesc: 'Safety Description',
+            textRiskScore: 'Text Risk Score',
+            foundKeywords: 'Keywords Found',
+        },
+
+        panel: {
+            title: 'Campaign Trust Evaluation',
+            subtitle: 'AI analysis of trust and risk level',
+            refresh: 'Re-evaluate',
+            loading: 'Loading evaluation...',
+            errorTitle: 'Evaluation Error',
+            loadError: 'Could not load evaluation. Please try again.',
+            refreshSuccess: 'Evaluation refreshed successfully.',
+            refreshError: 'Could not refresh evaluation. Please try again.',
+            trustScore: 'Trust Score',
+            riskScore: 'Risk Score',
+            confidence: 'Confidence',
+            volunteerTrust: 'Volunteer Trust',
+            riskAssessment: 'Risk Assessment',
+            validationResult: 'Validation Result',
+            contentAnalysis: 'Content Analysis',
+            notYetEvaluated: 'Not Yet Evaluated',
+            notYetEvaluatedDesc: 'This campaign has not been evaluated by the AI system.',
+            runFirstEval: 'Run First Evaluation',
+            sourceML: 'ML Service',
+            sourceFallback: 'Fallback',
+        },
+
+        volunteer: {
+            title: 'Volunteer Trust Evaluation',
+            subtitle: 'AI analysis of volunteer reliability',
+            trustScoreLabel: 'Trust Score',
+            reliabilityTitle: 'Reliability Summary',
+            totalRegistrations: 'Total Registrations',
+            cancelledRegistrations: 'Cancelled',
+            cancellationRate: 'Cancellation Rate',
+            completionRate: 'Completion Rate',
+            ratings: 'ratings',
+            behaviorFlags: 'Behavior Flags',
+            noEvaluation: 'No Evaluation',
+            noEvaluationDesc: 'This volunteer has not been evaluated yet.',
+        },
+
+        dashboard: {
+            title: 'Trust Evaluation Dashboard',
+            subtitle: 'System-wide AI evaluation statistics',
+            mlServiceOnline: 'ML Service Online',
+            mlServiceOffline: 'ML Service Offline',
+            modelsLoaded: 'models loaded',
+            loadError: 'Could not load statistics.',
+
+            riskDistribution: 'Risk Level Distribution',
+            trustDistribution: 'Trust Label Distribution',
+            recommendedActions: 'Recommended Actions',
+            evaluationSource: 'Evaluation Source',
+            recentHighRisk: 'Recent High-Risk Campaigns',
+            noHighRisk: 'No high-risk campaigns found.',
+            mlService: 'ML Service',
+            fallback: 'Fallback',
+            totalEvaluations: 'Total Evaluations',
+            yes: 'Yes',
+
+            riskLevels: {
+                low: 'Low',
+                medium: 'Medium',
+                high: 'High',
+                critical: 'Critical',
+            },
+
+            kpis: {
+                totalEvaluations: 'Total Evaluations',
+                avgTrustScore: 'Avg Trust Score',
+                avgRiskScore: 'Avg Risk Score',
+                highRiskCount: 'High Risk',
+                ofTotal: 'of total',
+                highTrust: 'High trust',
+                mediumTrust: 'Medium trust',
+                lowTrust: 'Low trust',
+            },
+
+            table: {
+                campaign: 'Campaign',
+                riskLevel: 'Risk Level',
+                trustScore: 'Trust Score',
+                anomaly: 'Anomaly',
+                evaluatedAt: 'Evaluated At',
+            },
+
+            campaignId: 'Campaign #{{id}}',
+        },
     },
 }
