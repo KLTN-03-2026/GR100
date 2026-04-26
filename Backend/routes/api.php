@@ -3,6 +3,7 @@
 use App\Http\Controllers\XacThucController;
 use App\Http\Controllers\DanhMucController;
 use App\Http\Controllers\ChienDichController;
+use App\Http\Controllers\KiemDuyetChienDichController;
 use App\Http\Controllers\ThamGiaChienDichController;
 use App\Http\Controllers\TrangChuController;
 use App\Http\Controllers\NguoiDungController;
@@ -87,4 +88,16 @@ Route::middleware(['auth:api', 'tinhNguyenVien'])->group(function () {
     Route::middleware('permission:ai_recommendation.view,campaign_coordination.view')->group(function () {
         Route::get('/goi-y', [RecommendationController::class, 'goiY']);
     });
+});
+
+// =========================================== KIỂM DUYỆT VIÊN =========================================
+Route::middleware(['auth:api', 'kiemDuyetVien'])->group(function () {
+    Route::middleware('permission:campaign_review.view')->group(function () {
+        Route::get('/kiem-duyet/chien-dich/bo-loc', [KiemDuyetChienDichController::class, 'boLoc']);
+        Route::get('/kiem-duyet/chien-dich', [KiemDuyetChienDichController::class, 'danhSach']);
+        Route::get('/kiem-duyet/chien-dich/{id}', [KiemDuyetChienDichController::class, 'chiTiet']);
+        Route::get('/kiem-duyet/chien-dich/{id}/feedback', [KiemDuyetChienDichController::class, 'danhSachFeedback']);
+        Route::get('/kiem-duyet/chien-dich/{id}/bao-cao', [KiemDuyetChienDichController::class, 'danhSachBaoCao']);
+    });
+
 });
