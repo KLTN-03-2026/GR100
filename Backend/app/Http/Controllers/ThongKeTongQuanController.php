@@ -9,6 +9,7 @@ use App\Models\NguoiDung;
 use App\Models\PhanHoiTnv;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
 class ThongKeTongQuanController extends Controller
@@ -196,6 +197,193 @@ class ThongKeTongQuanController extends Controller
     private function resolvePeriod(?string $period): string
     {
         return in_array($period, ['week', 'month', 'quarter', 'year'], true) ? $period : 'month';
+    }
+
+    public function thongKeKiemDuyet(Request $request)
+    {
+        $reviewer = auth('api')->user();
+        $period = $this->resolvePeriod($request->input('period'));
+        ['current_start' => $currentStart, 'current_end' => $currentEnd, 'previous_start' => $previousStart, 'previous_end' => $previousEnd] = $this->resolveDateRange($period);
+
+        $campaignQueueBase = ChienDich::query()->whereNull('xoa_luc');
+        $reviewedCampaignsBase = ChienDich::query()
+            ->whereNull('xoa_luc')
+            ->where('duyet_boi', $reviewer->id);
+        $assignedReportsBase = BaoCaoChienDich::query()->where('nguoi_xu_ly_id', $reviewer->id);
+        $feedbackBase = PhanHoiTnv::query()->whereHas('chienDich', function ($query) use ($reviewer) {
+            $query->whereNull('xoa_luc')->where('duyet_boi', $reviewer->id);
+        });
+        $registrationsBase = DangKyThamGia::query()
+            ->whereNotIn('trang_thai', ['da_huy', 'tu_choi'])
+            ->whereHas('chienDich', function ($query) use ($reviewer) {
+                $query->whereNull('xoa_luc')->where('duyet_boi', $reviewer->id);
+            });
+
+        $avgRating = round((float) ((clone $feedbackBase)->avg('so_sao') ?? 0), 1);
+
+        $kpis = [
+            'pending_review' => [
+                'key' => 'pending_review',
+                'label' => 'Chiến dịch chờ duyệt',
+                'value' => (clone $campaignQueueBase)->where('trang_thai', 'cho_duyet')->count(),
+                'icon' => 'fa-solid fa-hourglass-half',
+                'bg_color' => 'rgba(79,140,247,0.1)',
+                'color' => '#4f8cf7',
+                'trend' => $this->buildTrend(
+                    (clone $campaignQueueBase)->where('trang_thai', 'cho_duyet')->whereBetween('tao_luc', [$currentStart, $currentEnd])->count(),
+                    (clone $campaignQueueBase)->where('trang_thai', 'cho_duyet')->whereBetween('tao_luc', [$previousStart, $previousEnd])->count()
+                ),
+            ],
+            'cancel_requests' => [
+                'key' => 'cancel_requests',
+                'label' => 'Yêu cầu hủy chờ xử lý',
+                'value' => (clone $campaignQueueBase)->where('trang_thai', 'yeu_cau_huy')->count(),
+                'icon' => 'fa-solid fa-ban',
+                'bg_color' => 'rgba(253,126,20,0.1)',
+                'color' => '#fd7e14',
+                'trend' => $this->buildTrend(
+                    (clone $campaignQueueBase)->where('trang_thai', 'yeu_cau_huy')->whereBetween('cap_nhat_luc', [$currentStart, $currentEnd])->count(),
+                    (clone $campaignQueueBase)->where('trang_thai', 'yeu_cau_huy')->whereBetween('cap_nhat_luc', [$previousStart, $previousEnd])->count()
+                ),
+            ],
+            'processing_reports' => [
+                'key' => 'processing_reports',
+                'label' => 'Báo cáo đang xử lý',
+                'value' => (clone $assignedReportsBase)->where('trang_thai', 'dang_xu_ly')->count(),
+                'icon' => 'fa-solid fa-triangle-exclamation',
+                'bg_color' => 'rgba(220,53,69,0.1)',
+                'color' => '#dc3545',
+                'trend' => $this->buildTrend(
+                    (clone $assignedReportsBase)->where('trang_thai', 'dang_xu_ly')->whereBetween('cap_nhat_luc', [$currentStart, $currentEnd])->count(),
+                    (clone $assignedReportsBase)->where('trang_thai', 'dang_xu_ly')->whereBetween('cap_nhat_luc', [$previousStart, $previousEnd])->count()
+                ),
+            ],
+            'avg_rating' => [
+                'key' => 'avg_rating',
+                'label' => 'Điểm phản hồi trung bình',
+                'value' => $avgRating > 0 ? $avgRating : '0.0',
+                'icon' => 'fa-solid fa-star',
+                'bg_color' => 'rgba(40,167,69,0.1)',
+                'color' => '#28a745',
+                'trend' => [
+                    'text' => ((clone $feedbackBase)->count() > 0 ? (clone $feedbackBase)->count() : 0) . ' phản hồi',
+                    'positive' => $avgRating >= 4,
+                ],
+            ],
+        ];
+
+        $periodReviewedCampaignsBase = (clone $reviewedCampaignsBase)
+            ->where(function ($query) use ($currentStart, $currentEnd) {
+                $query->whereBetween('duyet_luc', [$currentStart, $currentEnd])
+                    ->orWhere(function ($subQuery) use ($currentStart, $currentEnd) {
+                        $subQuery->whereNull('duyet_luc')
+                            ->whereBetween('tao_luc', [$currentStart, $currentEnd]);
+                    });
+            });
+        $periodRegistrationsBase = (clone $registrationsBase)
+            ->whereBetween('dang_ky_luc', [$currentStart, $currentEnd]);
+
+        $monthlyData = $this->buildTimeBuckets($period, $currentEnd, function (CarbonInterface $start, CarbonInterface $end) use ($reviewedCampaignsBase, $registrationsBase) {
+            return [
+                'campaigns' => (clone $reviewedCampaignsBase)
+                    ->where(function ($query) use ($start, $end) {
+                        $query->whereBetween('duyet_luc', [$start, $end])
+                            ->orWhere(function ($subQuery) use ($start, $end) {
+                                $subQuery->whereNull('duyet_luc')
+                                    ->whereBetween('tao_luc', [$start, $end]);
+                            });
+                    })
+                    ->count(),
+                'volunteers' => (clone $registrationsBase)->whereBetween('dang_ky_luc', [$start, $end])->count(),
+            ];
+        });
+
+        $statusCounts = [
+            ['label' => 'Chờ duyệt', 'count' => (clone $campaignQueueBase)->where('trang_thai', 'cho_duyet')->count(), 'color' => '#ffc107', 'icon' => 'fa-solid fa-hourglass-half'],
+            ['label' => 'Đã duyệt', 'count' => (clone $reviewedCampaignsBase)->where('trang_thai', 'da_duyet')->count(), 'color' => '#20c997', 'icon' => 'fa-solid fa-check-double'],
+            ['label' => 'Đang diễn ra', 'count' => (clone $reviewedCampaignsBase)->where('trang_thai', 'dang_dien_ra')->count(), 'color' => '#0d6efd', 'icon' => 'fa-solid fa-play'],
+            ['label' => 'Hoàn thành', 'count' => (clone $reviewedCampaignsBase)->where('trang_thai', 'hoan_thanh')->count(), 'color' => '#6c757d', 'icon' => 'fa-solid fa-check'],
+        ];
+        $statusMax = max(1, ...collect($statusCounts)->pluck('count')->all());
+
+        $topRegionRows = (clone $periodReviewedCampaignsBase)
+            ->selectRaw('dia_diem, COUNT(*) as total')
+            ->whereNotNull('dia_diem')
+            ->where('dia_diem', '!=', '')
+            ->groupBy('dia_diem')
+            ->orderByDesc('total')
+            ->limit(6)
+            ->get();
+        $regionTotals = $topRegionRows->pluck('total')->map(fn ($value) => (int) $value)->all();
+        $regionMax = max([1, ...$regionTotals]);
+        $topRegions = $topRegionRows->map(fn ($item) => [
+            'name' => $item->dia_diem,
+            'volunteers' => (int) $item->total,
+            'percent' => $this->toPercent((int) $item->total, $regionMax),
+        ])->values();
+
+        $skillRows = collect(DB::table('chien_dich_ky_nangs as cdk')
+            ->join('chien_dichs as cd', 'cd.id', '=', 'cdk.chien_dich_id')
+            ->join('ky_nangs as kn', 'kn.id', '=', 'cdk.ky_nang_id')
+            ->selectRaw('kn.ten as ten, COUNT(*) as total')
+            ->whereNull('cd.xoa_luc')
+            ->where('cd.duyet_boi', $reviewer->id)
+            ->where(function ($query) use ($currentStart, $currentEnd) {
+                $query->whereBetween('cd.duyet_luc', [$currentStart, $currentEnd])
+                    ->orWhere(function ($subQuery) use ($currentStart, $currentEnd) {
+                        $subQuery->whereNull('cd.duyet_luc')
+                            ->whereBetween('cd.tao_luc', [$currentStart, $currentEnd]);
+                    });
+            })
+            ->groupBy('kn.id', 'kn.ten')
+            ->orderByDesc('total')
+            ->limit(6)
+            ->get());
+        $skillTotals = $skillRows->pluck('total')->map(fn ($v) => (int) $v)->all();
+        $skillMax = max([1, ...$skillTotals]);
+        $skillPalette = [
+            ['#4f8cf7', 'fa-solid fa-chalkboard-user'],
+            ['#e83e8c', 'fa-solid fa-bullhorn'],
+            ['#dc3545', 'fa-solid fa-kit-medical'],
+            ['#6f42c1', 'fa-solid fa-laptop-code'],
+            ['#fd7e14', 'fa-solid fa-utensils'],
+            ['#198754', 'fa-solid fa-hammer'],
+        ];
+        $topSkills = $skillRows->values()->map(function ($item, $index) use ($skillPalette, $skillMax) {
+            [$color, $icon] = $skillPalette[$index] ?? ['#4f8cf7', 'fa-solid fa-star'];
+
+            return [
+                'name' => $item->ten,
+                'count' => (int) $item->total,
+                'percent' => $this->toPercent((int) $item->total, $skillMax),
+                'color' => $color,
+                'icon' => $icon,
+            ];
+        });
+
+        return response()->json([
+            'status' => 1,
+            'message' => 'Lấy dữ liệu thống kê kiểm duyệt thành công.',
+            'data' => [
+                'period' => $period,
+                'kpis' => $kpis,
+                'monthly_data' => $monthlyData,
+                'period_summary' => [
+                    'campaigns' => (clone $periodReviewedCampaignsBase)->count(),
+                    'volunteers' => (clone $periodRegistrationsBase)->count(),
+                ],
+                'campaign_statuses' => collect($statusCounts)->map(fn (array $item) => [
+                    'label' => $item['label'],
+                    'count' => $item['count'],
+                    'percent' => $this->toPercent($item['count'], $statusMax),
+                    'icon' => $item['icon'],
+                    'color' => $item['color'],
+                    'bg_color' => $this->toAlphaColor($item['color']),
+                ])->values(),
+                'top_regions' => $topRegions,
+                'top_skills' => $topSkills,
+            ],
+        ]);
     }
 
     private function resolveDateRange(string $period): array

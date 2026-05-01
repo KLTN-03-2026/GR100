@@ -92,6 +92,10 @@ Route::middleware(['auth:api', 'tinhNguyenVien'])->group(function () {
 
 // =========================================== KIỂM DUYỆT VIÊN =========================================
 Route::middleware(['auth:api', 'kiemDuyetVien'])->group(function () {
+    Route::middleware('permission:statistics.view')->group(function () {
+        Route::get('/kiem-duyet/thong-ke', [ThongKeTongQuanController::class, 'thongKeKiemDuyet']);
+    });
+
     Route::middleware('permission:campaign_review.view')->group(function () {
         Route::get('/kiem-duyet/chien-dich/bo-loc', [KiemDuyetChienDichController::class, 'boLoc']);
         Route::get('/kiem-duyet/chien-dich', [KiemDuyetChienDichController::class, 'danhSach']);
@@ -100,4 +104,12 @@ Route::middleware(['auth:api', 'kiemDuyetVien'])->group(function () {
         Route::get('/kiem-duyet/chien-dich/{id}/bao-cao', [KiemDuyetChienDichController::class, 'danhSachBaoCao']);
     });
 
+    Route::middleware('permission:campaign_review.manage')->group(function () {
+        Route::put('/kiem-duyet/chien-dich/{id}/duyet', [KiemDuyetChienDichController::class, 'duyet']);
+        Route::put('/kiem-duyet/chien-dich/{id}/tu-choi', [KiemDuyetChienDichController::class, 'tuChoi']);
+        Route::put('/kiem-duyet/chien-dich/{id}/yeu-cau-huy/duyet', [KiemDuyetChienDichController::class, 'duyetYeuCauHuy']);
+        Route::put('/kiem-duyet/chien-dich/{id}/yeu-cau-huy/tu-choi', [KiemDuyetChienDichController::class, 'tuChoiYeuCauHuy']);
+        Route::put('/kiem-duyet/bao-cao/{id}/xu-ly', [KiemDuyetChienDichController::class, 'xuLyBaoCao']);
+    });
 });
+
