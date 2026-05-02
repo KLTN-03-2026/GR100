@@ -315,6 +315,7 @@ export default {
         explore: 'Explore',
         notFoundTitle: 'Campaign not found',
         notFoundDesc: 'The campaign does not exist or is no longer visible.',
+        cancelReasonTitle: 'Campaign cancellation reason',
         backToList: 'Back to campaign list',
         loadErrorMessage: 'Unable to load campaign detail.',
         locationLabel: 'Location',
@@ -1056,6 +1057,8 @@ export default {
             groups: {
                 dashboard: 'Dashboard',
                 campaignReview: 'Campaigns',
+                aiManagement: 'AI Module',
+                statistics: 'Statistics',
             },
             columns: {
                 access: 'Access',
@@ -1838,7 +1841,7 @@ export default {
         loading: 'Analyzing volunteer profiles, availability, and distance...',
         allocationTitle: 'Allocation suggestion',
         allocationDesc: 'Primary invitees, backup group, and workforce shortage warnings.',
-        sendSelectedEmails: 'Send selected emails ({count})',
+        sendSelectedEmails: 'Send email to selected volunteers',
         inviteTop: 'Invite top N',
         minLabel: 'Minimum',
         maxLabel: 'Maximum',

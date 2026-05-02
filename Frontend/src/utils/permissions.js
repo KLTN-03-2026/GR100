@@ -24,10 +24,20 @@ export const ADMIN_PERMISSION_GROUPS = [
 			{ key: 'campaign_review.manage', shortLabel: 'Quan ly' },
 		],
 	},
-
+	{
+		key: 'ai_management',
+		permissions: [{ key: 'ai_management.view', shortLabel: 'Truy cap' }],
+	},
 	{
 		key: 'statistics',
 		permissions: [{ key: 'statistics.view', shortLabel: 'Truy cap' }],
+	},
+	{
+		key: 'permission_management',
+		permissions: [
+			{ key: 'permission_management.view', shortLabel: 'Xem' },
+			{ key: 'permission_management.manage', shortLabel: 'Quan ly' },
+		],
 	},
 ];
 
@@ -42,6 +52,18 @@ export const REVIEWER_PERMISSION_GROUPS = [
 			{ key: 'campaign_review.view', shortLabel: 'Xem' },
 			{ key: 'campaign_review.manage', shortLabel: 'Quan ly' },
 		],
+	},
+	{
+		key: 'ai_management',
+		permissions: [
+			{ key: 'ai_management.view', shortLabel: 'Truy cap' },
+			{ key: 'trust_eval.view', shortLabel: 'Xem' },
+			{ key: 'trust_eval.refresh', shortLabel: 'Lam moi' },
+		],
+	},
+	{
+		key: 'statistics',
+		permissions: [{ key: 'statistics.view', shortLabel: 'Truy cap' }],
 	},
 ];
 
@@ -105,6 +127,8 @@ export const ADMIN_ROUTE_PERMISSIONS = [
 	{ path: '/admin/danh-muc', permission: 'category_management.view' },
 
 	{ path: '/kiem-duyet-vien/thong-ke', permission: 'statistics.view' },
+	{ path: '/admin/phan-quyen', permission: 'permission_management.view' },
+	{ path: '/admin/phan-quyen-nguoi-dung', permission: 'permission_management.view' },
 ];
 
 export const USER_ROUTE_PERMISSIONS = [
@@ -137,6 +161,10 @@ export const ROLE_DEFAULT_PERMISSIONS = {
 		'dashboard.view',
 		'campaign_review.view',
 		'campaign_review.manage',
+		'ai_management.view',
+		'statistics.view',
+		'trust_eval.view',
+		'trust_eval.refresh',
 	],
 	quan_tri_vien: [
 		'account_center.view',
@@ -148,8 +176,10 @@ export const ROLE_DEFAULT_PERMISSIONS = {
 		'category_management.manage',
 		'campaign_review.view',
 		'campaign_review.manage',
-
+		'ai_management.view',
 		'statistics.view',
+		'permission_management.view',
+		'permission_management.manage',
 	],
 };
 

@@ -134,6 +134,16 @@ const routes = [
         meta: { layout: 'admin', permissions: ['statistics.view'] }
     },
 
+    {
+        path: '/admin/phan-quyen',
+        component: () => import('../components/Admin/Phan_Quyen.vue'),
+        meta: { layout: 'admin', permissions: ['permission_management.view'] }
+    },
+    {
+        path: '/admin/phan-quyen-nguoi-dung',
+        component: () => import('../components/Admin/Phan_Quyen_Nguoi_Dung.vue'),
+        meta: { layout: 'admin', permissions: ['permission_management.view'] }
+    }
 ]
 
 const router = createRouter({

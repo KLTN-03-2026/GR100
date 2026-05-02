@@ -3,16 +3,16 @@
 		<div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
 			<div>
 				<h4 class="fw-bold mb-1">
-					<i class="fa-solid fa-shield-halved text-primary me-2"></i>{{ $t('admin.permissions.title') }}
+					<i class="fa-solid fa-user-shield text-primary me-2"></i>{{ $t('admin.userPermissions.title') }}
 				</h4>
-				<p class="text-muted mb-0 small">{{ $t('admin.permissions.subtitle') }}</p>
+				<p class="text-muted mb-0 small">{{ $t('admin.userPermissions.subtitle') }}</p>
 			</div>
 			<div class="d-flex gap-2 flex-wrap">
 				<span class="badge rounded-pill bg-light text-dark border px-3 py-2">
-					{{ $t('admin.permissions.badges.default') }}
+					{{ $t('admin.userPermissions.badges.scope') }}
 				</span>
 				<span class="badge rounded-pill bg-primary-subtle text-primary px-3 py-2">
-					{{ $t('admin.permissions.badges.custom') }}
+					{{ $t('admin.userPermissions.badges.separateTable') }}
 				</span>
 			</div>
 		</div>
@@ -42,20 +42,20 @@
 								v-model="searchQuery"
 								type="text"
 								class="form-control ps-5"
-								:placeholder="$t('admin.permissions.filter.searchPlaceholder')"
+								:placeholder="$t('admin.userPermissions.filter.searchPlaceholder')"
 							>
 							<i class="fa-solid fa-search position-absolute filter-icon"></i>
 						</div>
 					</div>
 					<div class="col-lg-2 col-md-4">
 						<select v-model="filterRole" class="form-select">
-							<option value="">{{ $t('admin.permissions.filter.allRoles') }}</option>
-							<option value="kiem_duyet_vien">{{ $t('admin.userManagement.roles.coordinator') }}</option>
+							<option value="">{{ $t('admin.userPermissions.filter.allRoles') }}</option>
+							<option value="tinh_nguyen_vien">{{ $t('admin.userManagement.roles.volunteer') }}</option>
 						</select>
 					</div>
 					<div class="col-lg-2 col-md-4">
 						<select v-model="filterStatus" class="form-select">
-							<option value="">{{ $t('admin.permissions.filter.allStatuses') }}</option>
+							<option value="">{{ $t('admin.userPermissions.filter.allStatuses') }}</option>
 							<option value="hoat_dong">{{ $t('admin.userManagement.statuses.active') }}</option>
 							<option value="cho_duyet">{{ $t('admin.userManagement.statuses.pending') }}</option>
 							<option value="bi_khoa">{{ $t('admin.userManagement.statuses.locked') }}</option>
@@ -63,14 +63,14 @@
 					</div>
 					<div class="col-lg-2 col-md-4">
 						<select v-model="filterMode" class="form-select">
-							<option value="">{{ $t('admin.permissions.filter.allModes') }}</option>
-							<option value="mac_dinh">{{ $t('admin.permissions.modes.default') }}</option>
-							<option value="tuy_chinh">{{ $t('admin.permissions.modes.custom') }}</option>
+							<option value="">{{ $t('admin.userPermissions.filter.allModes') }}</option>
+							<option value="mac_dinh">{{ $t('admin.userPermissions.modes.default') }}</option>
+							<option value="tuy_chinh">{{ $t('admin.userPermissions.modes.custom') }}</option>
 						</select>
 					</div>
 					<div class="col-lg-2 text-end">
 						<button class="btn btn-outline-secondary btn-sm" @click="resetFilters">
-							<i class="fa-solid fa-rotate-left me-1"></i>{{ $t('admin.permissions.filter.reset') }}
+							<i class="fa-solid fa-rotate-left me-1"></i>{{ $t('admin.userPermissions.filter.reset') }}
 						</button>
 					</div>
 				</div>
@@ -81,13 +81,13 @@
 			<div class="card-header bg-white border-bottom py-3">
 				<div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
 					<div>
-						<h6 class="fw-bold mb-1">{{ $t('admin.permissions.table.title') }}</h6>
+						<h6 class="fw-bold mb-1">{{ $t('admin.userPermissions.table.title') }}</h6>
 						<p class="text-muted small mb-0">
-							{{ $t('admin.permissions.table.summary', { groups: permissionGroups.length, permissions: permissionColumns.length, from: pageStart, to: pageEnd, total: totalUsers }) }}
+							{{ $t('admin.userPermissions.table.summary', { groups: permissionGroups.length, permissions: permissionColumns.length, from: pageStart, to: pageEnd, total: totalUsers }) }}
 						</p>
 					</div>
 					<div class="d-flex align-items-center gap-2 flex-wrap">
-						<span class="text-muted small">{{ $t('admin.permissions.table.rowsPerPage') }}</span>
+						<span class="text-muted small">{{ $t('admin.userPermissions.table.rowsPerPage') }}</span>
 						<select v-model.number="pageSize" class="form-select form-select-sm page-size-select">
 							<option v-for="size in pageSizeOptions" :key="size" :value="size">{{ size }}</option>
 						</select>
@@ -99,10 +99,10 @@
 					<table class="table permission-table align-middle mb-0">
 						<thead class="table-light">
 							<tr>
-								<th rowspan="2" class="sticky-col sticky-name">{{ $t('admin.permissions.table.columns.account') }}</th>
-								<th rowspan="2">{{ $t('admin.permissions.table.columns.role') }}</th>
-								<th rowspan="2">{{ $t('admin.permissions.table.columns.status') }}</th>
-								<th rowspan="2">{{ $t('admin.permissions.table.columns.mode') }}</th>
+								<th rowspan="2" class="sticky-col sticky-name">{{ $t('admin.userPermissions.table.columns.account') }}</th>
+								<th rowspan="2">{{ $t('admin.userPermissions.table.columns.role') }}</th>
+								<th rowspan="2">{{ $t('admin.userPermissions.table.columns.status') }}</th>
+								<th rowspan="2">{{ $t('admin.userPermissions.table.columns.mode') }}</th>
 								<th
 									v-for="group in permissionGroups"
 									:key="group.key"
@@ -111,8 +111,8 @@
 								>
 									{{ getGroupLabel(group.key) }}
 								</th>
-								<th rowspan="2" class="text-center">{{ $t('admin.permissions.table.columns.totalPermissions') }}</th>
-								<th rowspan="2" class="text-center">{{ $t('admin.permissions.table.columns.actions') }}</th>
+								<th rowspan="2" class="text-center">{{ $t('admin.userPermissions.table.columns.totalPermissions') }}</th>
+								<th rowspan="2" class="text-center">{{ $t('admin.userPermissions.table.columns.actions') }}</th>
 							</tr>
 							<tr>
 								<th
@@ -129,7 +129,7 @@
 							<tr
 								v-for="user in paginatedUsers"
 								:key="user.id"
-								:id="`permission-row-${user.id}`"
+								:id="`user-permission-row-${user.id}`"
 								:class="{ 'table-warning': isDirty(user) }"
 							>
 								<td class="sticky-col sticky-name bg-white">
@@ -143,7 +143,7 @@
 										<div class="min-w-0">
 											<div class="d-flex align-items-center gap-2 flex-wrap">
 												<h6 class="mb-0 small fw-bold text-truncate">{{ user.ho_ten }}</h6>
-												<span v-if="user.id === currentUserId" class="badge rounded-pill bg-info-subtle text-info">{{ $t('admin.permissions.table.currentAccount') }}</span>
+												<span v-if="user.id === currentUserId" class="badge rounded-pill bg-info-subtle text-info">{{ $t('admin.userPermissions.table.currentAccount') }}</span>
 											</div>
 											<span class="text-muted d-block" style="font-size: 12px;">{{ user.email }}</span>
 										</div>
@@ -161,7 +161,7 @@
 								</td>
 								<td>
 									<span class="badge rounded-pill" :class="user.su_dung_mac_dinh_pham_vi ? 'bg-light text-dark border' : 'bg-primary-subtle text-primary'">
-										{{ user.su_dung_mac_dinh_pham_vi ? $t('admin.permissions.modes.default') : $t('admin.permissions.modes.custom') }}
+										{{ user.su_dung_mac_dinh_pham_vi ? $t('admin.userPermissions.modes.default') : $t('admin.userPermissions.modes.custom') }}
 									</span>
 								</td>
 								<td
@@ -190,7 +190,7 @@
 											:disabled="!canManagePermissions || savingId === user.id || user.trang_thai === 'bi_khoa'"
 											@click="resetToDefault(user)"
 										>
-											<i class="fa-solid fa-rotate-left me-1"></i>{{ $t('admin.permissions.actions.resetDefault') }}
+											<i class="fa-solid fa-rotate-left me-1"></i>{{ $t('admin.userPermissions.actions.resetDefault') }}
 										</button>
 										<button
 											class="btn btn-sm btn-primary rounded-pill px-3"
@@ -198,7 +198,7 @@
 											@click="savePermissions(user)"
 										>
 											<span v-if="savingId === user.id" class="spinner-border spinner-border-sm me-2"></span>
-											<i v-else class="fa-solid fa-save me-1"></i>{{ $t('admin.permissions.actions.save') }}
+											<i v-else class="fa-solid fa-save me-1"></i>{{ $t('admin.userPermissions.actions.save') }}
 										</button>
 									</div>
 								</td>
@@ -212,15 +212,15 @@
 				</div>
 
 				<div class="text-center py-5" v-else-if="users.length === 0">
-					<i class="fa-solid fa-user-shield text-muted" style="font-size: 48px;"></i>
-					<p class="text-muted mt-3 mb-0">{{ $t('admin.permissions.table.empty') }}</p>
+					<i class="fa-solid fa-users text-muted" style="font-size: 48px;"></i>
+					<p class="text-muted mt-3 mb-0">{{ $t('admin.userPermissions.table.empty') }}</p>
 				</div>
 
 				<div v-if="!loading && users.length" class="d-flex align-items-center justify-content-between flex-wrap gap-3 border-top px-3 py-3">
 					<div class="text-muted small">
-						{{ $t('admin.permissions.table.pagination', { page: currentPage, totalPages, from: pageStart, to: pageEnd, total: totalUsers }) }}
+						{{ $t('admin.userPermissions.table.pagination', { page: currentPage, totalPages, from: pageStart, to: pageEnd, total: totalUsers }) }}
 					</div>
-					<nav :aria-label="$t('admin.permissions.table.ariaPagination')">
+					<nav :aria-label="$t('admin.userPermissions.table.ariaPagination')">
 						<ul class="pagination pagination-sm mb-0">
 							<li class="page-item" :class="{ disabled: currentPage === 1 }">
 								<button class="page-link" @click="goToPage(currentPage - 1)">{{ $t('common.previous') }}</button>
@@ -249,7 +249,7 @@ import {
 } from '../../utils/permissions';
 
 export default {
-	name: 'PhanQuyenAdmin',
+	name: 'PhanQuyenNguoiDung',
 	inject: ['toast'],
 	data() {
 		return {
@@ -271,6 +271,7 @@ export default {
 				tong: 0,
 				admin: 0,
 				kiem_duyet: 0,
+				tinh_nguyen_vien: 0,
 				mac_dinh: 0,
 				tuy_chinh: 0,
 			},
@@ -281,7 +282,7 @@ export default {
 			return hasPermission(this.currentUser, 'permission_management.manage');
 		},
 		permissionGroups() {
-			return getPermissionGroups('admin');
+			return getPermissionGroups('user');
 		},
 		permissionColumns() {
 			return this.permissionGroups.flatMap((group) => group.permissions.map((permission, index) => ({
@@ -318,31 +319,31 @@ export default {
 			return [
 				{
 					key: 'tong',
-					label: this.$t('admin.permissions.summary.totalAccounts'),
+					label: this.$t('admin.userPermissions.summary.totalAccounts'),
 					value: this.stats.tong,
-					icon: 'fa-solid fa-user-shield',
+					icon: 'fa-solid fa-users',
 					iconClass: 'bg-primary-subtle text-primary',
 				},
 				{
-					key: 'kiem_duyet',
-					label: this.$t('admin.permissions.summary.reviewers'),
-					value: this.stats.kiem_duyet,
-					icon: 'fa-solid fa-user-check',
-					iconClass: 'bg-warning-subtle text-warning',
+					key: 'tinh_nguyen_vien',
+					label: this.$t('admin.userPermissions.summary.volunteers'),
+					value: this.stats.tinh_nguyen_vien,
+					icon: 'fa-solid fa-hand-holding-heart',
+					iconClass: 'bg-success-subtle text-success',
 				},
 				{
 					key: 'mac_dinh',
-					label: this.$t('admin.permissions.summary.defaultMode'),
+					label: this.$t('admin.userPermissions.summary.defaultMode'),
 					value: this.stats.mac_dinh,
 					icon: 'fa-solid fa-layer-group',
 					iconClass: 'bg-secondary-subtle text-secondary',
 				},
 				{
 					key: 'tuy_chinh',
-					label: this.$t('admin.permissions.summary.customMode'),
+					label: this.$t('admin.userPermissions.summary.customMode'),
 					value: this.stats.tuy_chinh,
 					icon: 'fa-solid fa-sliders',
-					iconClass: 'bg-success-subtle text-success',
+					iconClass: 'bg-warning-subtle text-warning',
 				},
 			];
 		},
@@ -397,12 +398,14 @@ export default {
 		},
 		getRoleLabel(role) {
 			return {
+				tinh_nguyen_vien: this.$t('admin.userManagement.roles.volunteer'),
 				kiem_duyet_vien: this.$t('admin.userManagement.roles.coordinator'),
 				quan_tri_vien: this.$t('admin.userManagement.roles.admin'),
 			}[role] || role;
 		},
 		getRoleBadgeClass(role) {
 			return {
+				tinh_nguyen_vien: 'bg-primary-subtle text-primary',
 				kiem_duyet_vien: 'bg-success-subtle text-success',
 				quan_tri_vien: 'bg-warning-subtle text-warning',
 			}[role] || 'bg-secondary-subtle text-secondary';
@@ -423,37 +426,39 @@ export default {
 		},
 		getGroupLabel(groupKey) {
 			return {
-				dashboard: this.$t('admin.permissions.groups.dashboard'),
-				user_management: this.$t('admin.permissions.groups.userManagement'),
-				category_management: this.$t('admin.permissions.groups.categoryManagement'),
-				campaign_review: this.$t('admin.permissions.groups.campaignReview'),
-				ai_management: this.$t('admin.permissions.groups.aiManagement'),
-				statistics: this.$t('admin.permissions.groups.statistics'),
-				permission_management: this.$t('admin.permissions.groups.permissionManagement'),
+				account_center: this.$t('admin.userPermissions.groups.accountCenter'),
+				competency_profile: this.$t('admin.userPermissions.groups.competencyProfile'),
+				volunteer_campaigns: this.$t('admin.userPermissions.groups.volunteerCampaigns'),
+				campaign_coordination: this.$t('admin.userPermissions.groups.campaignCoordination'),
+				campaign_report_monitoring: this.$t('admin.userPermissions.groups.campaignReportMonitoring'),
+				feedback_tracking: this.$t('admin.userPermissions.groups.feedbackTracking'),
+				campaign_participation: this.$t('admin.userPermissions.groups.campaignParticipation'),
+				ai_recommendation: this.$t('admin.userPermissions.groups.aiRecommendation'),
 			}[groupKey] || groupKey;
+		},
+		getPermissionShortLabel(permissionKey) {
+			return {
+				'account_center.view': this.$t('admin.userPermissions.columns.view'),
+				'account_center.manage': this.$t('admin.userPermissions.columns.manage'),
+				'competency_profile.view': this.$t('admin.userPermissions.columns.view'),
+				'competency_profile.manage': this.$t('admin.userPermissions.columns.manage'),
+				'volunteer_campaigns.view': this.$t('admin.userPermissions.columns.view'),
+				'volunteer_campaigns.manage': this.$t('admin.userPermissions.columns.manage'),
+				'campaign_coordination.view': this.$t('admin.userPermissions.columns.view'),
+				'campaign_coordination.manage': this.$t('admin.userPermissions.columns.manage'),
+				'campaign_report_monitoring.view': this.$t('admin.userPermissions.columns.view'),
+				'campaign_report_monitoring.manage': this.$t('admin.userPermissions.columns.manage'),
+				'feedback_tracking.view': this.$t('admin.userPermissions.columns.view'),
+				'feedback_tracking.manage': this.$t('admin.userPermissions.columns.manage'),
+				'campaign_participation.manage': this.$t('admin.userPermissions.columns.join'),
+				'ai_recommendation.view': this.$t('admin.userPermissions.columns.ai'),
+			}[permissionKey] || permissionKey;
 		},
 		getPermissionCellClass(permission) {
 			return {
 				'permission-group-start': permission.isGroupStart,
 				'permission-group-end': permission.isGroupEnd,
 			};
-		},
-		getPermissionShortLabel(permissionKey) {
-			return {
-				'dashboard.view': this.$t('admin.permissions.columns.access'),
-				'user_management.view': this.$t('admin.permissions.columns.view'),
-				'user_management.manage': this.$t('admin.permissions.columns.manage'),
-				'category_management.view': this.$t('admin.permissions.columns.view'),
-				'category_management.manage': this.$t('admin.permissions.columns.manage'),
-				'campaign_review.view': this.$t('admin.permissions.columns.view'),
-				'campaign_review.manage': this.$t('admin.permissions.columns.manage'),
-				'ai_management.view': this.$t('admin.permissions.columns.access'),
-				'trust_eval.view': this.$t('admin.permissions.columns.view'),
-				'trust_eval.refresh': this.$t('admin.permissions.columns.manage'),
-				'statistics.view': this.$t('admin.permissions.columns.access'),
-				'permission_management.view': this.$t('admin.permissions.columns.view'),
-				'permission_management.manage': this.$t('admin.permissions.columns.manage'),
-			}[permissionKey] || permissionKey;
 		},
 		normalizePermissions(list = []) {
 			return [...list].sort();
@@ -484,12 +489,11 @@ export default {
 		async fetchUsers() {
 			this.loading = true;
 			try {
-				const params = {};
+				const params = { pham_vi: 'user' };
 				if (this.searchQuery.trim()) params.tu_khoa = this.searchQuery.trim();
 				if (this.filterRole) params.vai_tro = this.filterRole;
 				if (this.filterStatus) params.trang_thai = this.filterStatus;
 				if (this.filterMode) params.che_do_quyen = this.filterMode;
-				params.pham_vi = 'admin';
 
 				const { data } = await api.get('/admin/phan-quyen', { params });
 				this.users = data.data || [];
@@ -502,7 +506,7 @@ export default {
 				}
 				this.$nextTick(() => this.focusRequestedUser());
 			} catch (error) {
-				this.showToast('error', this.$t('admin.permissions.toast.loadErrorTitle'), error.response?.data?.message || this.$t('admin.permissions.toast.loadErrorMessage'));
+				this.showToast('error', this.$t('admin.userPermissions.toast.loadErrorTitle'), error.response?.data?.message || this.$t('admin.userPermissions.toast.loadErrorMessage'));
 			} finally {
 				this.loading = false;
 			}
@@ -511,15 +515,15 @@ export default {
 			this.savingId = user.id;
 			try {
 				const payload = {
-					pham_vi: 'admin',
+					pham_vi: 'user',
 					quyen_han: this.getDraftPermissions(user.id),
 				};
 				const { data } = await api.put(`/admin/phan-quyen/${user.id}`, payload);
 				this.updateUserRow(data.data);
 				await this.fetchUsers();
-				this.showToast('success', this.$t('admin.permissions.toast.saveSuccessTitle'), this.$t('admin.permissions.toast.saveSuccessMessage', { name: user.ho_ten }));
+				this.showToast('success', this.$t('admin.userPermissions.toast.saveSuccessTitle'), this.$t('admin.userPermissions.toast.saveSuccessMessage', { name: user.ho_ten }));
 			} catch (error) {
-				this.showToast('error', this.$t('admin.permissions.toast.saveErrorTitle'), error.response?.data?.message || this.$t('admin.permissions.toast.saveErrorMessage'));
+				this.showToast('error', this.$t('admin.userPermissions.toast.saveErrorTitle'), error.response?.data?.message || this.$t('admin.userPermissions.toast.saveErrorMessage'));
 			} finally {
 				this.savingId = null;
 			}
@@ -527,12 +531,12 @@ export default {
 		async resetToDefault(user) {
 			this.savingId = user.id;
 			try {
-				const { data } = await api.put(`/admin/phan-quyen/${user.id}`, { pham_vi: 'admin', su_dung_mac_dinh: true });
+				const { data } = await api.put(`/admin/phan-quyen/${user.id}`, { pham_vi: 'user', su_dung_mac_dinh: true });
 				this.updateUserRow(data.data);
 				await this.fetchUsers();
-				this.showToast('success', this.$t('admin.permissions.toast.resetSuccessTitle'), this.$t('admin.permissions.toast.resetSuccessMessage', { name: user.ho_ten }));
+				this.showToast('success', this.$t('admin.userPermissions.toast.resetSuccessTitle'), this.$t('admin.userPermissions.toast.resetSuccessMessage', { name: user.ho_ten }));
 			} catch (error) {
-				this.showToast('error', this.$t('admin.permissions.toast.saveErrorTitle'), error.response?.data?.message || this.$t('admin.permissions.toast.saveErrorMessage'));
+				this.showToast('error', this.$t('admin.userPermissions.toast.saveErrorTitle'), error.response?.data?.message || this.$t('admin.userPermissions.toast.saveErrorMessage'));
 			} finally {
 				this.savingId = null;
 			}
@@ -547,6 +551,7 @@ export default {
 				tong: this.users.length,
 				admin: this.users.filter((user) => user.vai_tro === 'quan_tri_vien').length,
 				kiem_duyet: this.users.filter((user) => user.vai_tro === 'kiem_duyet_vien').length,
+				tinh_nguyen_vien: this.users.filter((user) => user.vai_tro === 'tinh_nguyen_vien').length,
 				mac_dinh: this.users.filter((user) => user.su_dung_mac_dinh_pham_vi).length,
 				tuy_chinh: this.users.filter((user) => !user.su_dung_mac_dinh_pham_vi).length,
 			};
@@ -584,7 +589,7 @@ export default {
 				return;
 			}
 
-			const row = document.getElementById(`permission-row-${focusId}`);
+			const row = document.getElementById(`user-permission-row-${focusId}`);
 			if (!row) return;
 			row.scrollIntoView({ behavior: 'smooth', block: 'center' });
 		},
@@ -645,7 +650,7 @@ export default {
 }
 
 .permission-table {
-	min-width: 1720px;
+	min-width: 1880px;
 	width: max-content;
 }
 

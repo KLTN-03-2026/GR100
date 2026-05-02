@@ -61,6 +61,23 @@
 					</ul>
 				</div>
 
+				<div class="nav-section" v-if="can('permission_management.view')">
+					<span class="nav-section-title" v-show="!sidebarCollapsed">{{ $t('admin.layout.permissionSection') }}</span>
+					<ul class="nav flex-column">
+						<li class="nav-item">
+							<router-link to="/admin/phan-quyen" class="nav-link" :class="{ active: $route.path === '/admin/phan-quyen' }">
+								<i class="fa-solid fa-shield-keyhole"></i>
+								<span v-show="!sidebarCollapsed">{{ $t('admin.layout.permissions') }}</span>
+							</router-link>
+						</li>
+						<li class="nav-item">
+							<router-link to="/admin/phan-quyen-nguoi-dung" class="nav-link" :class="{ active: $route.path === '/admin/phan-quyen-nguoi-dung' }">
+								<i class="fa-solid fa-user-lock"></i>
+								<span v-show="!sidebarCollapsed">{{ $t('admin.layout.userPermissions') }}</span>
+							</router-link>
+						</li>
+					</ul>
+				</div>
 			</nav>
 
 			<div class="sidebar-footer" v-show="!sidebarCollapsed">
