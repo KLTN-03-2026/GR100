@@ -112,10 +112,13 @@ class NguoiDung extends Authenticatable implements JWTSubject
     public function layTatCaQuyen(): array
     {
         if ($this->dangDungQuyenMacDinh()) {
-            return $this->layQuyenMacDinhTheoVaiTro();
+            return PermissionRegistry::filterPermissionsForRole(
+                $this->vai_tro,
+                $this->layQuyenMacDinhTheoVaiTro()
+            );
         }
 
-        return PermissionRegistry::normalize($this->quyen_han ?? []);
+        return PermissionRegistry::filterPermissionsForRole($this->vai_tro, $this->quyen_han ?? []);
     }
 
     public function coQuyen(string $permission): bool
@@ -178,5 +181,10 @@ class NguoiDung extends Authenticatable implements JWTSubject
     public function baoCaoChienDichs()
     {
         return $this->hasMany(\App\Models\BaoCaoChienDich::class, 'nguoi_gui_id');
+    }
+
+    public function taiKhoanLienKets()
+    {
+        return $this->hasMany(\App\Models\TaiKhoanLienKet::class, 'nguoi_dung_id');
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Jobs\SendMailJob;
 use App\Models\ChienDich;
 use App\Models\DangKyThamGia;
+use App\Models\KhuVuc;
 use App\Models\LoaiChienDich;
 use App\Models\ThongBao;
 use Illuminate\Http\Request;
@@ -14,6 +15,15 @@ use Illuminate\Support\Facades\DB;
 class ThamGiaChienDichController extends Controller
 {
     private const PUBLIC_STATUSES = ['da_duyet', 'dang_dien_ra', 'hoan_thanh'];
+
+    private function daHetHanDangKy(ChienDich $campaign): bool
+    {
+        if (!$campaign->han_dang_ky) {
+            return false;
+        }
+
+        return now()->startOfDay()->gt($campaign->han_dang_ky->copy()->startOfDay());
+    }
 
     public function boLoc()
     {
@@ -61,28 +71,22 @@ class ThamGiaChienDichController extends Controller
                 $statusCounts[$statusKey] = ($statusCounts[$statusKey] ?? 0) + 1;
             });
 
-        $locations = [
-            [
-                'value' => 'TP.HCM',
-                'count' => (clone $baseQuery)->where('dia_diem', 'like', '%TP.HCM%')->count(),
-            ],
-            [
-                'value' => 'Hà Nội',
-                'count' => (clone $baseQuery)->where('dia_diem', 'like', '%Hà Nội%')->count(),
-            ],
-            [
-                'value' => 'Đà Nẵng',
-                'count' => (clone $baseQuery)->where('dia_diem', 'like', '%Đà Nẵng%')->count(),
-            ],
-            [
-                'value' => 'Khác',
-                'count' => (clone $baseQuery)
-                    ->where('dia_diem', 'not like', '%TP.HCM%')
-                    ->where('dia_diem', 'not like', '%Hà Nội%')
-                    ->where('dia_diem', 'not like', '%Đà Nẵng%')
-                    ->count(),
-            ],
-        ];
+        $locationCounts = (clone $baseQuery)
+            ->select('chien_dichs.khu_vuc_id', DB::raw('COUNT(chien_dichs.id) as total'))
+            ->whereNotNull('chien_dichs.khu_vuc_id')
+            ->groupBy('chien_dichs.khu_vuc_id')
+            ->pluck('total', 'chien_dichs.khu_vuc_id');
+
+        $locations = KhuVuc::query()
+            ->orderBy('ten')
+            ->get(['id', 'ten'])
+            ->map(fn ($item) => [
+                'value' => (string) $item->id,
+                'label' => $item->ten,
+                'count' => (int) ($locationCounts[$item->id] ?? 0),
+            ])
+            ->filter(fn ($item) => $item['count'] > 0)
+            ->values();
 
         return response()->json([
             'status' => 1,
@@ -95,7 +99,7 @@ class ThamGiaChienDichController extends Controller
                     ['value' => 'completed', 'count' => (int) ($statusCounts['completed'] ?? 0)],
                 ],
                 'categories' => $categories,
-                'locations' => array_values(array_filter($locations, fn ($item) => $item['count'] > 0)),
+                'locations' => $locations,
                 'creators' => $creators->map(fn ($item) => [
                     'value' => (string) $item->id,
                     'label' => $item->ho_ten,
@@ -148,7 +152,7 @@ class ThamGiaChienDichController extends Controller
                             $innerQuery->where('trang_thai', 'da_duyet')
                                 ->where(function ($dateQuery) {
                                     $dateQuery->whereNull('han_dang_ky')
-                                        ->orWhere('han_dang_ky', '>=', now());
+                                        ->orWhereDate('han_dang_ky', '>=', now()->toDateString());
                                 });
                         });
                     }
@@ -157,7 +161,7 @@ class ThamGiaChienDichController extends Controller
                         $subQuery->orWhere(function ($innerQuery) {
                             $innerQuery->where('trang_thai', 'da_duyet')
                                 ->whereNotNull('han_dang_ky')
-                                ->where('han_dang_ky', '<', now());
+                                ->whereDate('han_dang_ky', '<', now()->toDateString());
                         });
                     }
 
@@ -172,7 +176,9 @@ class ThamGiaChienDichController extends Controller
             }
         }
 
-        if ($request->filled('dia_diem')) {
+        if ($request->filled('khu_vuc_id')) {
+            $query->where('khu_vuc_id', $request->integer('khu_vuc_id'));
+        } elseif ($request->filled('dia_diem')) {
             $diaDiem = trim($request->dia_diem);
             if ($diaDiem === 'Khác') {
                 $query->where(function ($subQuery) {
@@ -249,18 +255,31 @@ class ThamGiaChienDichController extends Controller
     {
         $user = auth('api')->user();
 
-        $campaign = ChienDich::query()
+        $detailQuery = ChienDich::query()
             ->where('id', $id)
             ->whereNull('xoa_luc')
-            ->whereIn('trang_thai', self::PUBLIC_STATUSES)
             ->with([
                 'loaiChienDich:id,ten,bieu_tuong,mau_sac',
                 'kyNangs:ky_nangs.id,ten',
+                'hinhAnhChienDich:id,chien_dich_id,duong_dan_anh,thu_tu',
                 'nguoiTao:id,ho_ten,email',
                 'duyetBoi:id,ho_ten,email',
                 'feedbacks.nguoiDung:id,ho_ten,email',
-            ])
+            ]);
+
+        $campaign = (clone $detailQuery)
+            ->whereIn('trang_thai', self::PUBLIC_STATUSES)
             ->first();
+
+        if (
+            !$campaign
+            && $user
+            && $this->coLichSuThamGiaChienDich((int) $id, (int) $user->id)
+        ) {
+            $campaign = (clone $detailQuery)
+                ->whereIn('trang_thai', ['yeu_cau_huy', 'da_huy'])
+                ->first();
+        }
 
         if (!$campaign) {
             return response()->json([
@@ -551,6 +570,7 @@ class ThamGiaChienDichController extends Controller
             ->with([
                 'loaiChienDich:id,ten,bieu_tuong,mau_sac',
                 'kyNangs:ky_nangs.id,ten',
+                'hinhAnhChienDich:id,chien_dich_id,duong_dan_anh,thu_tu',
                 'nguoiTao:id,ho_ten,email',
                 'duyetBoi:id,ho_ten,email',
             ]);
@@ -566,6 +586,7 @@ class ThamGiaChienDichController extends Controller
             'tieu_de' => $campaign->tieu_de,
             'mo_ta' => $campaign->mo_ta,
             'anh_bia' => $campaign->anh_bia,
+            'danh_sach_anh' => $campaign->danh_sach_anh,
             'dia_diem' => $campaign->dia_diem,
             'vi_do' => $campaign->vi_do,
             'kinh_do' => $campaign->kinh_do,
@@ -598,13 +619,18 @@ class ThamGiaChienDichController extends Controller
     {
         $dangKy = $this->dangKyHienTai($campaign->id, $user?->id);
         $flags = $this->buildAvailabilityFlags($campaign, $dangKy);
+        $lyDoHuy = null;
+        if (in_array($campaign->trang_thai, ['yeu_cau_huy', 'da_huy'], true)) {
+            $lyDoHuy = $dangKy?->ly_do_huy ?: ($campaign->ly_do_tu_choi ?: null);
+        }
 
         return [
             'id' => $campaign->id,
             'tieu_de' => $campaign->tieu_de,
             'mo_ta' => $campaign->mo_ta,
             'anh_bia' => $campaign->anh_bia,
-            'images' => $campaign->anh_bia ? [$campaign->anh_bia] : [],
+            'danh_sach_anh' => $campaign->danh_sach_anh,
+            'images' => $campaign->danh_sach_anh,
             'dia_diem' => $campaign->dia_diem,
             'vi_do' => $campaign->vi_do,
             'kinh_do' => $campaign->kinh_do,
@@ -613,6 +639,7 @@ class ThamGiaChienDichController extends Controller
             'han_dang_ky' => optional($campaign->han_dang_ky)->format('Y-m-d'),
             'muc_do_uu_tien' => $campaign->muc_do_uu_tien,
             'trang_thai' => $campaign->trang_thai,
+            'ly_do_huy' => $lyDoHuy,
             'so_luong_toi_da' => $campaign->so_luong_toi_da,
             'so_dang_ky' => $campaign->so_dang_ky,
             'so_xac_nhan' => $campaign->so_xac_nhan,
@@ -657,7 +684,7 @@ class ThamGiaChienDichController extends Controller
         }
 
         if ($campaign->trang_thai === 'da_duyet') {
-            $daHetHanDangKy = $campaign->han_dang_ky && now()->gt($campaign->han_dang_ky);
+            $daHetHanDangKy = $this->daHetHanDangKy($campaign);
             return $daHetHanDangKy ? 'closed_registration' : 'registering';
         }
 
@@ -677,9 +704,17 @@ class ThamGiaChienDichController extends Controller
             ->first();
     }
 
+    private function coLichSuThamGiaChienDich(int $campaignId, int $userId): bool
+    {
+        return DangKyThamGia::query()
+            ->where('chien_dich_id', $campaignId)
+            ->where('nguoi_dung_id', $userId)
+            ->exists();
+    }
+
     private function buildAvailabilityFlags(ChienDich $campaign, ?DangKyThamGia $dangKy): array
     {
-        $daHetHanDangKy = $campaign->han_dang_ky && now()->gt($campaign->han_dang_ky);
+        $daHetHanDangKy = $this->daHetHanDangKy($campaign);
         $dangMoDangKy = $campaign->trang_thai === 'da_duyet' && !$daHetHanDangKy;
         $daDuSoLuong = $this->daDuSoLuongTinhNguyenVien($campaign);
 
@@ -694,7 +729,7 @@ class ThamGiaChienDichController extends Controller
 
     private function coMoDangKy(ChienDich $campaign): bool
     {
-        $daHetHanDangKy = $campaign->han_dang_ky && now()->gt($campaign->han_dang_ky);
+        $daHetHanDangKy = $this->daHetHanDangKy($campaign);
 
         return $campaign->trang_thai === 'da_duyet' && !$daHetHanDangKy;
     }
@@ -787,3 +822,4 @@ class ThamGiaChienDichController extends Controller
         Cache::forget("campaigns:participation-reminder-sent:{$dangKyId}");
     }
 }
+

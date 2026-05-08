@@ -194,11 +194,6 @@ class ThongKeTongQuanController extends Controller
         ]);
     }
 
-    private function resolvePeriod(?string $period): string
-    {
-        return in_array($period, ['week', 'month', 'quarter', 'year'], true) ? $period : 'month';
-    }
-
     public function thongKeKiemDuyet(Request $request)
     {
         $reviewer = auth('api')->user();
@@ -384,6 +379,11 @@ class ThongKeTongQuanController extends Controller
                 'top_skills' => $topSkills,
             ],
         ]);
+    }
+
+    private function resolvePeriod(?string $period): string
+    {
+        return in_array($period, ['week', 'month', 'quarter', 'year'], true) ? $period : 'month';
     }
 
     private function resolveDateRange(string $period): array

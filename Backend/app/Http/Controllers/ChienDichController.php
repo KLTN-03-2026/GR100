@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Jobs\SendMailJob;
 use App\Models\ChienDich;
+use App\Models\DangKyThamGia;
 use App\Models\LichSuKiemDuyetChienDich;
 use App\Models\LoaiChienDich;
 use App\Models\ThongBao;
+use App\Services\AreaResolutionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -16,6 +18,11 @@ use Illuminate\Support\Facades\Storage;
 
 class ChienDichController extends Controller
 {
+    public function __construct(
+        private readonly AreaResolutionService $areaResolutionService,
+    ) {
+    }
+
     // ======================== DANH SÁCH CHIẾN DỊCH CỦA NGƯỜI TẠO ========================
     public function danhSach(Request $request)
     {
@@ -26,8 +33,11 @@ class ChienDichController extends Controller
             ->whereNull('xoa_luc')
             ->with([
                 'loaiChienDich:id,ten,bieu_tuong,mau_sac',
+                'khuVuc:id,ten',
                 'kyNangs:ky_nangs.id,ten',
+                'hinhAnhChienDich:id,chien_dich_id,duong_dan_anh,thu_tu',
                 'nguoiTao:id,ho_ten,email',
+                'duyetBoi:id,ho_ten,email,vai_tro',
             ]);
 
         // Filter by status
@@ -54,6 +64,25 @@ class ChienDichController extends Controller
             $query->where('muc_do_uu_tien', $request->muc_do_uu_tien);
         }
 
+        if (filter_var($request->input('for_coordination', false), FILTER_VALIDATE_BOOLEAN)) {
+            $today = Carbon::today()->toDateString();
+
+            $query
+                ->where('trang_thai', 'da_duyet')
+                ->where(function ($subQuery) use ($today) {
+                    $subQuery->whereNull('han_dang_ky')
+                        ->orWhereDate('han_dang_ky', '>=', $today);
+                })
+                ->where(function ($subQuery) use ($today) {
+                    $subQuery->whereNull('ngay_ket_thuc')
+                        ->orWhereDate('ngay_ket_thuc', '>=', $today);
+                })
+                ->where(function ($subQuery) {
+                    $subQuery->whereNull('so_luong_toi_da')
+                        ->orWhereColumn('so_dang_ky', '<', 'so_luong_toi_da');
+                });
+        }
+
         $paginated = $query->orderByDesc('tao_luc')->paginate($perPage);
 
         $mapped = $paginated->getCollection()->map(function ($cd) {
@@ -62,7 +91,9 @@ class ChienDichController extends Controller
                 'tieu_de'             => $cd->tieu_de,
                 'mo_ta'               => $cd->mo_ta,
                 'anh_bia'             => $cd->anh_bia,
+                'danh_sach_anh'       => $cd->danh_sach_anh,
                 'dia_diem'            => $cd->dia_diem,
+                'khu_vuc'             => $cd->khuVuc ? ['id' => $cd->khuVuc->id, 'ten' => $cd->khuVuc->ten] : null,
                 'vi_do'               => $cd->vi_do,
                 'kinh_do'             => $cd->kinh_do,
                 'ngay_bat_dau'        => $cd->ngay_bat_dau?->format('Y-m-d'),
@@ -80,6 +111,11 @@ class ChienDichController extends Controller
                 'loai_chien_dich'     => $cd->loaiChienDich,
                 'nguoi_tao_id'        => $cd->nguoi_tao_id,
                 'nguoi_tao'           => $cd->nguoiTao,
+                'duyet_boi'           => $cd->duyetBoi,
+                // Alias tạm để FE cũ chưa cần sửa ngay.
+                'kiem_duyet_vien'     => $cd->duyetBoi,
+                'duyet_luc'           => $cd->duyet_luc?->format('Y-m-d H:i:s'),
+                'ly_do_tu_choi'       => $cd->ly_do_tu_choi,
                 'ky_nangs'            => $cd->kyNangs->map(fn($kyNang) => [
                     'id'  => $kyNang->id,
                     'ten' => $kyNang->ten,
@@ -110,8 +146,11 @@ class ChienDichController extends Controller
             ->whereNull('xoa_luc')
             ->with([
                 'loaiChienDich:id,ten,bieu_tuong,mau_sac',
+                'khuVuc:id,ten',
                 'kyNangs:ky_nangs.id,ten',
+                'hinhAnhChienDich:id,chien_dich_id,duong_dan_anh,thu_tu',
                 'nguoiTao:id,ho_ten,email',
+                'duyetBoi:id,ho_ten,email,vai_tro',
                 'dangKyThamGias.nguoiDung:id,ho_ten,email',
                 'dangKyThamGias.nguoiDung.kyNangs:ky_nangs.id,ten',
                 'dangKyThamGias.nguoiDung.khuVucs:khu_vucs.id,ten',
@@ -133,7 +172,9 @@ class ChienDichController extends Controller
                 'tieu_de'             => $cd->tieu_de,
                 'mo_ta'               => $cd->mo_ta,
                 'anh_bia'             => $cd->anh_bia,
+                'danh_sach_anh'       => $cd->danh_sach_anh,
                 'dia_diem'            => $cd->dia_diem,
+                'khu_vuc'             => $cd->khuVuc ? ['id' => $cd->khuVuc->id, 'ten' => $cd->khuVuc->ten] : null,
                 'vi_do'               => $cd->vi_do,
                 'kinh_do'             => $cd->kinh_do,
                 'ngay_bat_dau'        => $cd->ngay_bat_dau?->format('Y-m-d'),
@@ -151,6 +192,11 @@ class ChienDichController extends Controller
                 'loai_chien_dich'     => $cd->loaiChienDich,
                 'nguoi_tao_id'        => $cd->nguoi_tao_id,
                 'nguoi_tao'           => $cd->nguoiTao,
+                'duyet_boi'           => $cd->duyetBoi,
+                // Alias tạm để FE cũ chưa cần sửa ngay.
+                'kiem_duyet_vien'     => $cd->duyetBoi,
+                'duyet_luc'           => $cd->duyet_luc?->format('Y-m-d H:i:s'),
+                'ly_do_tu_choi'       => $cd->ly_do_tu_choi,
                 'ky_nangs'            => $cd->kyNangs->map(fn($kyNang) => [
                     'id'  => $kyNang->id,
                     'ten' => $kyNang->ten,
@@ -339,6 +385,8 @@ class ChienDichController extends Controller
             'mo_ta'              => 'nullable|string',
             'loai_chien_dich_id' => 'nullable|integer|exists:loai_chien_dichs,id',
             'anh_bia'            => 'nullable|image|max:5120',
+            'anh_phu'            => 'nullable|array',
+            'anh_phu.*'          => 'image|max:5120',
             'dia_diem'           => 'required|string|max:500',
             'vi_do'              => 'nullable|numeric',
             'kinh_do'            => 'nullable|numeric',
@@ -355,19 +403,23 @@ class ChienDichController extends Controller
         $user = auth('api')->user();
         $hanDangKy = $request->han_dang_ky
             ? Carbon::parse($request->han_dang_ky)->toDateString()
-            : Carbon::parse($request->ngay_bat_dau)->subDays(3)->toDateString();
-        $anhBiaUrl = $request->hasFile('anh_bia')
-            ? $this->luuAnhBia($request->file('anh_bia'))
-            : null;
+            : Carbon::parse($request->ngay_bat_dau)->toDateString();
+        $imagePayload = $this->xuLyDanhSachAnhChienDich($request);
 
-        $cd = DB::transaction(function () use ($request, $user, $hanDangKy, $anhBiaUrl) {
+        $cd = DB::transaction(function () use ($request, $user, $hanDangKy, $imagePayload) {
+            $campaignAreaId = $this->areaResolutionService->resolveCampaignAreaId(
+                null,
+                $request->dia_diem
+            );
+
             $cd = ChienDich::create([
                 'nguoi_tao_id'        => $user->id,
                 'loai_chien_dich_id' => $request->loai_chien_dich_id,
                 'tieu_de'            => $request->tieu_de,
                 'mo_ta'              => $request->mo_ta,
-                'anh_bia'            => $anhBiaUrl,
+                'anh_bia'            => $imagePayload['anh_bia'],
                 'dia_diem'           => $request->dia_diem,
+                'khu_vuc_id'         => $campaignAreaId,
                 'vi_do'              => $request->vi_do,
                 'kinh_do'            => $request->kinh_do,
                 'ngay_bat_dau'       => $request->ngay_bat_dau,
@@ -376,7 +428,7 @@ class ChienDichController extends Controller
                 'so_luong_toi_da'    => $request->so_luong_toi_da,
                 'so_luong_toi_thieu' => $request->so_luong_toi_thieu ?? 1,
                 'muc_do_uu_tien'     => $request->muc_do_uu_tien,
-                'trang_thai'         => 'da_duyet',
+                'trang_thai'         => 'cho_duyet',
             ]);
 
             // Sync kỹ năng yêu cầu
@@ -384,12 +436,14 @@ class ChienDichController extends Controller
                 $cd->kyNangs()->sync($request->ky_nang_ids);
             }
 
+            $this->dongBoHinhAnhChienDich($cd, $imagePayload['danh_sach_anh']);
+
             return $cd;
         });
 
         return response()->json([
             'status'  => 1,
-            'message' => 'Tạo chiến dịch thành công.',
+            'message' => 'Tạo chiến dịch thành công. Đang chờ Kiểm duyệt viên phê duyệt.',
             'data'    => ['id' => $cd->id],
         ], 201);
     }
@@ -402,6 +456,10 @@ class ChienDichController extends Controller
             'mo_ta'              => 'nullable|string',
             'loai_chien_dich_id' => 'nullable|integer|exists:loai_chien_dichs,id',
             'anh_bia'            => 'nullable|image|max:5120',
+            'anh_phu'            => 'nullable|array',
+            'anh_phu.*'          => 'image|max:5120',
+            'danh_sach_anh_hien_tai'   => 'nullable|array',
+            'danh_sach_anh_hien_tai.*' => 'string|max:500',
             'dia_diem'           => 'required|string|max:500',
             'vi_do'              => 'nullable|numeric',
             'kinh_do'            => 'nullable|numeric',
@@ -439,18 +497,22 @@ class ChienDichController extends Controller
 
         $hanDangKy = $request->han_dang_ky
             ? Carbon::parse($request->han_dang_ky)->toDateString()
-            : Carbon::parse($request->ngay_bat_dau)->subDays(3)->toDateString();
-        $anhBiaUrl = $request->hasFile('anh_bia')
-            ? $this->luuAnhBia($request->file('anh_bia'))
-            : $cd->getRawOriginal('anh_bia');
+            : ($cd->han_dang_ky?->toDateString() ?? Carbon::parse($request->ngay_bat_dau)->toDateString());
+        $imagePayload = $this->xuLyDanhSachAnhChienDich($request, $cd);
 
-        DB::transaction(function () use ($request, $cd, $hanDangKy, $anhBiaUrl) {
+        DB::transaction(function () use ($request, $cd, $hanDangKy, $imagePayload) {
+            $campaignAreaId = $this->areaResolutionService->resolveCampaignAreaId(
+                null,
+                $request->dia_diem
+            ) ?? $cd->khu_vuc_id;
+
             $cd->update([
                 'loai_chien_dich_id' => $request->loai_chien_dich_id,
                 'tieu_de'            => $request->tieu_de,
                 'mo_ta'              => $request->mo_ta,
-                'anh_bia'            => $anhBiaUrl,
+                'anh_bia'            => $imagePayload['anh_bia'],
                 'dia_diem'           => $request->dia_diem,
+                'khu_vuc_id'         => $campaignAreaId,
                 'vi_do'              => $request->vi_do,
                 'kinh_do'            => $request->kinh_do,
                 'ngay_bat_dau'       => $request->ngay_bat_dau,
@@ -463,6 +525,7 @@ class ChienDichController extends Controller
 
             // Sync kỹ năng yêu cầu
             $cd->kyNangs()->sync($request->ky_nang_ids ?? []);
+            $this->dongBoHinhAnhChienDich($cd, $imagePayload['danh_sach_anh']);
         });
 
         $this->forgetOwnerStartReminderCache($cd->id);
@@ -607,7 +670,7 @@ class ChienDichController extends Controller
             ], 404);
         }
 
-        if (!in_array($cd->trang_thai, ['da_duyet', 'nhap'], true)) {
+        if (!in_array($cd->trang_thai, ['da_duyet', 'cho_duyet', 'nhap'], true)) {
             return response()->json([
                 'status' => 0,
                 'message' => 'Chỉ có thể cập nhật trạng thái tham gia khi chiến dịch chưa bắt đầu.',
@@ -640,6 +703,26 @@ class ChienDichController extends Controller
         $trangThaiCu = $dangKy->trang_thai;
         $trangThaiMoi = $request->string('trang_thai')->value();
         $ghiChu = trim((string) $request->input('ghi_chu', ''));
+
+        if ($trangThaiMoi === 'da_duyet') {
+            $chienDichTrungLich = $this->timChienDichTrungNgayBatDauKhiDuyet($dangKy->nguoi_dung_id, $cd);
+
+            if ($chienDichTrungLich) {
+                $thoiGianTrungLich = $this->dinhDangKhoangThoiGianChienDich($chienDichTrungLich);
+
+                return response()->json([
+                    'status' => 0,
+                    'message' => 'Không thể duyệt tình nguyện viên này vì họ đã được duyệt ở chiến dịch "' . $chienDichTrungLich->tieu_de . '"' . ($thoiGianTrungLich ? ' (' . $thoiGianTrungLich . ')' : '') . ' có ngày bắt đầu trùng với chiến dịch hiện tại.',
+                    'data' => [
+                        'conflict_campaign' => [
+                            'id' => $chienDichTrungLich->id,
+                            'tieu_de' => $chienDichTrungLich->tieu_de,
+                            'thoi_gian' => $thoiGianTrungLich,
+                        ],
+                    ],
+                ], 422);
+            }
+        }
 
         if ($trangThaiCu === $trangThaiMoi && $ghiChu === trim((string) ($dangKy->ghi_chu ?? ''))) {
             return response()->json([
@@ -735,6 +818,13 @@ class ChienDichController extends Controller
             ], 422);
         }
 
+        if ($cd->trang_thai === 'yeu_cau_huy') {
+            return response()->json([
+                'status'  => 0,
+                'message' => 'Chiến dịch này đang chờ Kiểm duyệt viên duyệt hủy.',
+            ], 422);
+        }
+
         if ($cd->trang_thai === 'hoan_thanh') {
             return response()->json([
                 'status'  => 0,
@@ -742,24 +832,41 @@ class ChienDichController extends Controller
             ], 422);
         }
 
-        $lyDo = $request->ly_do ?? 'Người tạo chiến dịch hủy chiến dịch.';
+        $lyDo = $request->ly_do ?? 'Người tạo chiến dịch yêu cầu hủy chiến dịch.';
 
         $cd->update([
-            'trang_thai'    => 'da_huy',
+            'trang_thai'    => 'yeu_cau_huy',
             'ly_do_tu_choi' => $lyDo,
         ]);
 
         LichSuKiemDuyetChienDich::create([
             'chien_dich_id' => $cd->id,
             'nguoi_thuc_hien_id' => $user->id,
-            'hanh_dong' => 'huy_chien_dich',
+            'hanh_dong' => 'gui_yeu_cau_huy',
             'tu_trang_thai' => $cd->getOriginal('trang_thai'),
-            'den_trang_thai' => 'da_huy',
+            'den_trang_thai' => 'yeu_cau_huy',
             'ghi_chu' => $lyDo,
             'du_lieu_bo_sung' => [
                 'nguoi_tao_id' => $user->id,
             ],
         ]);
+
+        $danhSachKiemDuyetVien = \App\Models\NguoiDung::where('vai_tro', 'kiem_duyet_vien')
+            ->whereNull('xoa_luc')
+            ->get(['id']);
+
+        foreach ($danhSachKiemDuyetVien as $kiemDuyetVien) {
+            ThongBao::create([
+                'nguoi_dung_id' => $kiemDuyetVien->id,
+                'nguoi_gui_id' => $user->id,
+                'loai' => 'cap_nhat_cd',
+                'tieu_de' => 'Có yêu cầu hủy chiến dịch mới',
+                'noi_dung' => 'Chiến dịch "' . $cd->tieu_de . '" đang chờ kiểm duyệt yêu cầu hủy.',
+                'loai_tham_chieu' => 'chien_dich',
+                'tham_chieu_id' => $cd->id,
+                'gui_qua' => 'he_thong',
+            ]);
+        }
 
         // Gửi email thông báo cho tất cả TNV đã đăng ký (chưa hủy) rằng chiến dịch đang chờ xét duyệt hủy.
         $danhSachDangKy = $cd->dangKyThamGias()
@@ -772,7 +879,7 @@ class ChienDichController extends Controller
             if ($tnv && $tnv->email) {
                 \App\Jobs\SendMailJob::dispatch(
                     $tnv->email,
-                    'Thông báo: Chiến dịch "' . $cd->tieu_de . '" đã bị hủy',
+                    'Thông báo: Chiến dịch "' . $cd->tieu_de . '" đang chờ xét duyệt hủy',
                     'huy_chien_dich',
                     [
                         'ho_ten'          => $tnv->ho_ten,
@@ -781,7 +888,7 @@ class ChienDichController extends Controller
                         'ngay_bat_dau'    => $cd->ngay_bat_dau?->format('d/m/Y'),
                         'ngay_ket_thuc'   => $cd->ngay_ket_thuc?->format('d/m/Y'),
                         'ly_do'           => $lyDo,
-                        'trang_thai_huy'  => 'da_huy',
+                        'trang_thai_huy'  => 'yeu_cau_huy',
                         'link_chien_dich' => config('app.frontend_url', 'http://localhost:5173') . '/danh-sach-chien-dich',
                     ]
                 );
@@ -792,7 +899,7 @@ class ChienDichController extends Controller
 
         return response()->json([
             'status'  => 1,
-            'message' => 'Hủy chiến dịch thành công.'
+            'message' => 'Đã gửi yêu cầu hủy chiến dịch. Vui lòng chờ Kiểm duyệt viên phê duyệt.'
                 . ($danhSachDangKy->count() > 0 ? ' Đã thông báo đến ' . $danhSachDangKy->count() . ' tình nguyện viên.' : ''),
         ]);
     }
@@ -1073,6 +1180,41 @@ class ChienDichController extends Controller
         return $noiDung;
     }
 
+    private function timChienDichTrungNgayBatDauKhiDuyet(int $nguoiDungId, ChienDich $chienDichHienTai): ?ChienDich
+    {
+        $ngayBatDauHienTai = $chienDichHienTai->ngay_bat_dau ?? $chienDichHienTai->ngay_ket_thuc;
+
+        if (!$ngayBatDauHienTai) {
+            return null;
+        }
+
+        $dangKyTrungNgay = DangKyThamGia::query()
+            ->where('nguoi_dung_id', $nguoiDungId)
+            ->whereIn('trang_thai', ['da_duyet', 'dang_tham_gia'])
+            ->whereHas('chienDich', function ($query) use ($chienDichHienTai, $ngayBatDauHienTai) {
+                $query->whereNull('xoa_luc')
+                    ->where('id', '!=', $chienDichHienTai->id)
+                    ->whereDate('ngay_bat_dau', $ngayBatDauHienTai->toDateString());
+            })
+            ->with('chienDich:id,tieu_de,ngay_bat_dau,ngay_ket_thuc')
+            ->orderByDesc('duyet_luc')
+            ->first();
+
+        return $dangKyTrungNgay?->chienDich;
+    }
+
+    private function dinhDangKhoangThoiGianChienDich(ChienDich $chienDich): ?string
+    {
+        $ngayBatDau = $chienDich->ngay_bat_dau ?? $chienDich->ngay_ket_thuc;
+        $ngayKetThuc = $chienDich->ngay_ket_thuc ?? $chienDich->ngay_bat_dau;
+
+        if (!$ngayBatDau || !$ngayKetThuc) {
+            return null;
+        }
+
+        return $ngayBatDau->format('d/m/Y') . ' - ' . $ngayKetThuc->format('d/m/Y');
+    }
+
     private function taoThongBaoCapNhatTrangThaiChienDich(int $nguoiDungId, int $nguoiGuiId, string $tieuDe, string $noiDung, int $campaignId): void
     {
         ThongBao::create([
@@ -1112,6 +1254,70 @@ class ChienDichController extends Controller
         $path = $file->store('campaign-covers', 'public');
 
         return Storage::disk('public')->url($path);
+    }
+
+    private function xuLyDanhSachAnhChienDich(Request $request, ?ChienDich $chienDich = null): array
+    {
+        $existingImages = collect();
+
+        if ($chienDich) {
+            $existingImages = $request->has('danh_sach_anh_hien_tai')
+                ? collect($request->input('danh_sach_anh_hien_tai', []))
+                : collect($chienDich->danh_sach_anh);
+        }
+
+        $coverImage = $request->hasFile('anh_bia')
+            ? $this->luuAnhBia($request->file('anh_bia'))
+            : null;
+
+        $uploadedDetailImages = collect();
+
+        if ($request->hasFile('anh_phu')) {
+            foreach ((array) $request->file('anh_phu') as $file) {
+                if ($file) {
+                    $uploadedDetailImages->push($this->luuAnhBia($file));
+                }
+            }
+        }
+
+        $existingImages = $existingImages
+            ->reject(fn ($item) => $coverImage && $item === $coverImage);
+
+        $allImages = collect([$coverImage])
+            ->filter()
+            ->merge($existingImages)
+            ->merge($uploadedDetailImages)
+            ->map(fn ($item) => is_string($item) ? trim($item) : null)
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        return [
+            'anh_bia' => $allImages[0] ?? null,
+            'danh_sach_anh' => $allImages,
+        ];
+    }
+
+    private function dongBoHinhAnhChienDich(ChienDich $chienDich, array $imageUrls): void
+    {
+        $chienDich->hinhAnhChienDich()->delete();
+
+        if (empty($imageUrls)) {
+            return;
+        }
+
+        $payload = collect($imageUrls)
+            ->values()
+            ->map(fn ($url, $index) => [
+                'chien_dich_id' => $chienDich->id,
+                'duong_dan_anh' => $url,
+                'thu_tu' => $index,
+                'tao_luc' => now(),
+            ])
+            ->all();
+
+        $chienDich->hinhAnhChienDich()->insert($payload);
     }
 
     private function forgetOwnerStartReminderCache(int $campaignId): void

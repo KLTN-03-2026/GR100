@@ -22,9 +22,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->alias([
             "tinhNguyenVien" => \App\Http\Middleware\TinhNguyenVienMiddleware::class,
-            "kiemDuyetVien" => \App\Http\Middleware\KiemDuyetVienMiddleware::class,
-            "quanTriVien" => \App\Http\Middleware\QuanTriVienMiddleware::class,
-            "permission" => \App\Http\Middleware\PermissionMiddleware::class,
+            "kiemDuyetVien"   => \App\Http\Middleware\KiemDuyetVienMiddleware::class,
+            "quanTriVien"    => \App\Http\Middleware\QuanTriVienMiddleware::class,
+            "permission"     => \App\Http\Middleware\PermissionMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

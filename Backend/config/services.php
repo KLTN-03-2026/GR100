@@ -35,4 +35,42 @@ return [
         ],
     ],
 
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect_uri' => env('GOOGLE_REDIRECT_URI', 'postmessage'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | ML Trust Evaluation Service
+    |--------------------------------------------------------------------------
+    |
+    | Cấu hình cho Python ML Service đánh giá độ tin cậy & rủi ro chiến dịch.
+    |
+    */
+
+    'ml_trust' => [
+        // Bật/tắt ML service (false = chỉ dùng fallback rule-based)
+        'enabled' => env('ML_TRUST_ENABLED', true),
+
+        // URL của Python FastAPI ML Service
+        'url' => env('ML_TRUST_SERVICE_URL', 'http://127.0.0.1:8001'),
+
+        // Timeout kết nối ML Service (giây)
+        'timeout' => env('ML_TRUST_TIMEOUT', 10),
+
+        // TTL cache kết quả evaluation (giây)
+        'cache_ttl' => env('ML_TRUST_CACHE_TTL', 3600),
+
+        // TTL cache cho volunteer evaluation (giây) - dài hơn vì ít thay đổi
+        'volunteer_cache_ttl' => env('ML_TRUST_VOLUNTEER_CACHE_TTL', 21600),
+
+        // Bật fallback rule-based khi ML service unavailable
+        'fallback_enabled' => env('ML_TRUST_FALLBACK_ENABLED', true),
+
+        // Internal API key dùng để Laravel gọi ML service an toàn hơn
+        'internal_key' => env('ML_TRUST_INTERNAL_KEY'),
+    ],
+
 ];
